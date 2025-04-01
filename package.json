@@ -1,0 +1,7 @@
+{
+  "name": "a-cloud",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
