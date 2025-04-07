@@ -1,0 +1,12 @@
+services:
+  postgres_a_cloud:
+    image: "postgres:latest"
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - postgres_a_cloud_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_a_cloud_data: {}

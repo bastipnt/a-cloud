@@ -1,0 +1,26 @@
+{
+  "name": "a-server",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "bun test",
+    "dev": "bun run --watch index.ts",
+    "gen-migrations": "bunx drizzle-kit generate --config drizzle.config.ts",
+    "migrate": "bun run ./src/db/migrate.ts"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.2.0",
+    "a-crypto": "workspace:*",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.41.0",
+    "elysia": "latest",
+    "js-yaml": "^4.1.0",
+    "pg": "^8.14.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.8",
+    "@types/js-yaml": "^4.0.9",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.30.6"
+  },
+  "module": "index.js"
+}
