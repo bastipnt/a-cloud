@@ -1,4 +1,4 @@
-import { genNewUserKeys } from "a-crypto";
+import { createCryptoWorker } from "a-crypto";
 import { client } from "..";
 import type { UserKeys } from "a-crypto/types";
 
@@ -12,7 +12,9 @@ export const createNewUser = async (
   email: string,
   password: string
 ): Promise<[string, UserKeys]> => {
-  const keyParams = await genNewUserKeys(password);
+  const cryptoWorker = await createCryptoWorker().remote;
+
+  const keyParams = await cryptoWorker.genNewUserKeys(password);
   const userParams = { email };
 
   const res = await client.user.new.put({ userParams, keyParams });

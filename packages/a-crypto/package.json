@@ -13,6 +13,7 @@
   },
   "type": "module",
   "dependencies": {
+    "comlink": "^4.4.2",
     "libsodium-wrappers-sumo": "^0.7.15"
   }
 }

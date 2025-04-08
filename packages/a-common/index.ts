@@ -4,3 +4,5 @@ export const mergeUint8Arrays = (as: Uint8Array[]): Uint8Array => {
   as.reduce((n, xs) => (result.set(xs, n), n + xs.length), 0);
   return result;
 };
+
+export { ComlinkWorker } from "./src/comlink-worker";

@@ -18,3 +18,4 @@ export { encryptFile, encryptBoxBase64 } from "./src/encrypt";
 export { decryptFile } from "./src/decrypt";
 export { genNewUserKeys } from "./src/generate";
 export { getHashBase64 } from "./src/hash";
+export { createCryptoWorker } from "./src/util/worker-helper";
