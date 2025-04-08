@@ -1,25 +1,30 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { boolean, pgTable, varchar, timestamp } from "drizzle-orm/pg-core";
 import { getDateNow } from "../helpers/default-value-helpers";
 import { relations } from "drizzle-orm";
+
 import { keysTable } from "./keys";
 import { filesTable } from "./files";
+import { ottsTable } from "./otts";
+import { srpsTable } from "./srps";
 
-export const usersTable = sqliteTable("users", {
-  userId: text()
+export const usersTable = pgTable("users", {
+  userId: varchar()
     .$defaultFn(() => crypto.randomUUID())
     .primaryKey(),
-  encryptedEmail: text().notNull().unique(),
-  emailNonce: text().notNull(),
-  emailHash: text().notNull(),
 
-  hasTwoFactorEnabled: integer({ mode: "boolean" })
-    .notNull()
-    .$defaultFn(() => false),
-  hasEmailVerified: integer({ mode: "boolean" })
+  encryptedEmail: varchar().notNull().unique(),
+  emailNonce: varchar().notNull(),
+  emailHash: varchar().notNull(),
+
+  hasTwoFactorEnabled: boolean()
     .notNull()
     .$defaultFn(() => false),
 
-  createdAt: integer({ mode: "timestamp" })
+  hasEmailVerified: boolean()
+    .notNull()
+    .$defaultFn(() => false),
+
+  createdAt: timestamp()
     .notNull()
     .$defaultFn(() => getDateNow()),
 });
@@ -30,4 +35,12 @@ export const usersFilesRelations = relations(usersTable, ({ many }) => ({
 
 export const usersKeysRelations = relations(usersTable, ({ one }) => ({
   keys: one(keysTable),
+}));
+
+export const usersOTTsRelations = relations(usersTable, ({ one }) => ({
+  ott: one(ottsTable),
+}));
+
+export const usersSRPsRelations = relations(usersTable, ({ one }) => ({
+  srp: one(srpsTable),
 }));

@@ -1,36 +1,36 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow } from "../helpers/default-value-helpers";
 import { usersTable } from "./users";
 import { relations } from "drizzle-orm";
 
-export const keysTable = sqliteTable("keys", {
-  id: text()
+export const keysTable = pgTable("keys", {
+  id: varchar()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
 
-  userId: text()
+  userId: varchar()
     .notNull()
     .references(() => usersTable.userId),
 
-  keyEncryptionKeySalt: text().notNull(),
+  keyEncryptionKeySalt: varchar().notNull(),
 
-  encryptedMainKey: text().notNull(), // encrypted with `keyEncryptionKey`
-  mainKeyNonce: text().notNull(),
+  encryptedMainKey: varchar().notNull(), // encrypted with `keyEncryptionKey`
+  mainKeyNonce: varchar().notNull(),
 
-  encryptedMainKeyWithRecoveryKey: text().notNull(), // encrypted with `recoveryKey`
-  mainKeyWithRecoveryKeyNonce: text().notNull(),
+  encryptedMainKeyWithRecoveryKey: varchar().notNull(), // encrypted with `recoveryKey`
+  mainKeyWithRecoveryKeyNonce: varchar().notNull(),
 
-  encryptedRecoveryKey: text().notNull(), // encrypted with `mainKey`
-  recoveryKeyNonce: text().notNull(),
+  encryptedRecoveryKey: varchar().notNull(), // encrypted with `mainKey`
+  recoveryKeyNonce: varchar().notNull(),
 
-  encryptedPrivateKey: text().notNull(), // encrypted with `mainKey`
-  privateKeyNonce: text().notNull(),
-  publicKey: text().notNull(), // used to encrypt `authToken`
+  encryptedPrivateKey: varchar().notNull(), // encrypted with `mainKey`
+  privateKeyNonce: varchar().notNull(),
+  publicKey: varchar().notNull(), // used to encrypt `authToken`
 
   memLimit: integer().notNull(),
   opsLimit: integer().notNull(),
 
-  createdAt: integer({ mode: "timestamp" })
+  createdAt: timestamp()
     .notNull()
     .$defaultFn(() => getDateNow()),
 });

@@ -9,3 +9,5 @@ export const serverKeys = {
   encryptionKey: config.serverKeys.encryptionKey as Base64URLString,
   hashingKey: config.serverKeys.hashingKey as Base64URLString,
 };
+
+export const jwtSecret = config.jwt.secret as Base64URLString;

@@ -85,7 +85,7 @@ export const deriveSensitiveKeyBase64 = async (
  *
  * @returns [privateKey, publicKey]
  */
-export const generateKeyPairBase64 = async (): Promise<[string, string]> => {
+export const genKeyPairBase64 = async (): Promise<[string, string]> => {
   await sodium.ready;
 
   const keyPair = sodium.crypto_box_keypair();
@@ -125,7 +125,7 @@ export const genNewUserKeys = async (
     mainKey
   );
 
-  const [privateKey, publicKey] = await generateKeyPairBase64();
+  const [privateKey, publicKey] = await genKeyPairBase64();
   const [encryptedPrivateKey, privateKeyNonce] = await encryptBoxBase64(
     privateKey,
     mainKey
@@ -150,4 +150,37 @@ export const genNewUserKeys = async (
     opsLimit: keyEncryptionKey.opsLimit,
     memLimit: keyEncryptionKey.memLimit,
   };
+};
+
+/**
+ * generate one time token
+ *
+ * @returns one time token with 6 digits
+ */
+export const genOTT = () => {
+  const numDigits = 6;
+  const digits = "0123456789";
+  let ott = "";
+  const len = digits.length;
+  for (let i = 0; i < numDigits; i++) {
+    ott += digits[Math.floor(Math.random() * len)];
+  }
+
+  return ott;
+};
+
+/**
+ * generate alphanumeric one time token
+ *
+ * @returns one time token with 6 digits
+ */
+export const genOTTAlphaNum = () => {
+  const numDigits = 6;
+  const digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+  let ott = "";
+  let len = digits.length;
+  for (let i = 0; i < numDigits; i++) {
+    ott += digits[Math.floor(Math.random() * len)];
+  }
+  return ott;
 };

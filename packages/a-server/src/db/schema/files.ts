@@ -1,25 +1,27 @@
+import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { usersTable } from "./users";
 import { getDateNow } from "../helpers/default-value-helpers";
 
-export const filesTable = sqliteTable("files", {
-  fileId: text()
+export const filesTable = pgTable("files", {
+  fileId: varchar()
     .$defaultFn(() => crypto.randomUUID())
     .primaryKey(),
 
-  ownerId: text().notNull(),
+  ownerId: varchar()
+    .notNull()
+    .references(() => usersTable.userId),
 
-  fileDecryptionHeader: text().notNull(),
-  thumbnailDecryptionHeader: text(),
+  fileDecryptionHeader: varchar().notNull(),
+  thumbnailDecryptionHeader: varchar(),
 
-  metadataDecryptionHeader: text().notNull(),
-  encryptedMetadata: text().notNull(), // encrypted with `mainKey` and  `metadateDecryptionHeader`
+  metadataDecryptionHeader: varchar().notNull(),
+  encryptedMetadata: varchar().notNull(), // encrypted with `mainKey` and  `metadateDecryptionHeader`
 
-  createdAt: integer({ mode: "timestamp" })
+  createdAt: timestamp()
     .notNull()
     .$defaultFn(() => getDateNow()),
-  updatedAt: integer({ mode: "timestamp" })
+  updatedAt: timestamp()
     .notNull()
     .$defaultFn(() => getDateNow()),
 });

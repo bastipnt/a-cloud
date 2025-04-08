@@ -1,5 +1,5 @@
 import sodium from "libsodium-wrappers-sumo";
-import { toBase64 } from "./util/conversion-helper";
+import { fromBase64, toBase64 } from "./util/conversion-helper";
 
 export const getHashBase64 = async (
   input: string,
@@ -11,7 +11,7 @@ export const getHashBase64 = async (
     sodium.crypto_generichash(
       sodium.crypto_generichash_BYTES,
       input,
-      hashingKey
+      await fromBase64(hashingKey)
     )
   );
 };
