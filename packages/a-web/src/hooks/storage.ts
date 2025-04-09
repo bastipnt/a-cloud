@@ -1,9 +1,17 @@
-import { UserKeys } from "a-crypto/types";
-
 export const useStorage = () => {
-  const storeUserKeys = (userId: string, userKeys: UserKeys) => {
-    localStorage.setItem(`userKeys-${userId}`, JSON.stringify(userKeys));
+  // const store = (name: string, value: string | object) => {
+  //   if (typeof value === "object") value = JSON.stringify(value);
+
+  //   localStorage.setItem(name, value);
+  // };
+
+  const storeEmail = (email: string) => {
+    localStorage.setItem("email", email);
   };
 
-  return { storeUserKeys };
+  const getEmail = () => {
+    return localStorage.getItem("email");
+  };
+
+  return { storeEmail, getEmail };
 };

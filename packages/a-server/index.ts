@@ -2,14 +2,21 @@ import { Elysia } from "elysia";
 import { uploadRoutes } from "./src/upload";
 import { cors } from "@elysiajs/cors";
 import { downloadRoutes } from "./src/download";
-import { db } from "./src/db";
-import { usersTable } from "./src/db/schema/users";
+import { migrateDB } from "./src/db";
 import { userRoutes } from "./src/user";
+import { userAuthRoutes } from "./src/userAuth";
 
-// migrateDB();
+migrateDB();
 
 export const app = new Elysia()
-  .use(cors())
+  .use(
+    cors({
+      allowedHeaders: ["Content-Type"],
+      credentials: true,
+      origin: "localhost:5173",
+    })
+  )
+  .use(userAuthRoutes)
   .use(userRoutes)
   .use(uploadRoutes)
   .use(downloadRoutes);

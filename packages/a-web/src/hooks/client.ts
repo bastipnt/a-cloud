@@ -1,5 +1,23 @@
-import { uploadStream, downloadFile, createNewUser } from "a-client";
+import {
+  uploadStream,
+  downloadFile,
+  signUp,
+  finishSignUp,
+  verifyOTT,
+  signIn,
+  proofSignIn,
+  getUser,
+} from "a-client";
 
 export const useClient = () => {
-  return { uploadStream, downloadFile, createNewUser };
+  return {
+    uploadStream,
+    downloadFile,
+    signIn,
+    proofSignIn,
+    signUp,
+    finishSignUp,
+    verifyOTT,
+    getUser,
+  };
 };

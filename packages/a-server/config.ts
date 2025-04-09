@@ -11,3 +11,11 @@ export const serverKeys = {
 };
 
 export const jwtSecret = config.jwt.secret as Base64URLString;
+
+export const dbConf = {
+  host: config.db.host,
+  port: config.db.port,
+  name: config.db.name,
+  user: config.db.user,
+  password: config.db.password,
+};

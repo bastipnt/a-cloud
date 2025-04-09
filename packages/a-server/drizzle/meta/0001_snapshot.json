@@ -1,6 +1,6 @@
 {
-  "id": "fcb72823-8173-4a09-b0ed-d2e767bfb3f6",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "a3162294-1e1b-40ea-95d8-c3caddc4a2e9",
+  "prevId": "fcb72823-8173-4a09-b0ed-d2e767bfb3f6",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -354,6 +354,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "encryptedEmail"
+          ]
+        },
+        "users_emailHash_unique": {
+          "name": "users_emailHash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "emailHash"
           ]
         }
       },

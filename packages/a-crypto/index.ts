@@ -19,3 +19,9 @@ export { decryptFile } from "./src/decrypt";
 export { genNewUserKeys, genOTT } from "./src/generate";
 export { getHashBase64 } from "./src/hash";
 export { createCryptoWorker } from "./src/util/worker-helper";
+export {
+  genSrpAttributes,
+  genSrpClientEphemeral,
+  deriveSrpClientSession,
+  verifySrpSession,
+} from "./src/srpClient";

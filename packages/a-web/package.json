@@ -12,12 +12,16 @@
   },
   "dependencies": {
     "@elysiajs/eden": "^1.2.0",
+    "@swan-io/srp": "^0.2.6",
+    "a-client": "workspace:*",
+    "a-common": "workspace:*",
     "a-crypto": "workspace:*",
     "a-media": "workspace:*",
-    "a-common": "workspace:*",
-    "a-client": "workspace:*",
+    "formik": "^2.4.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "wouter": "^3.6.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

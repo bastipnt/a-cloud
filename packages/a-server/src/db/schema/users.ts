@@ -14,7 +14,7 @@ export const usersTable = pgTable("users", {
 
   encryptedEmail: varchar().notNull().unique(),
   emailNonce: varchar().notNull(),
-  emailHash: varchar().notNull(),
+  emailHash: varchar().notNull().unique(),
 
   hasTwoFactorEnabled: boolean()
     .notNull()
