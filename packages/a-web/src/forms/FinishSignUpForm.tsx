@@ -1,5 +1,5 @@
 import { Field, Form, FormikErrors, FormikProps, withFormik } from "formik";
-import { object, string, InferType } from "yup";
+import { InferType, object, string } from "yup";
 
 const finishSignUpSchema = object({
   email: string().email().required(),
@@ -7,8 +7,7 @@ const finishSignUpSchema = object({
   passwordRepeat: string().required(),
 });
 
-export interface FinishSignUpFormValues
-  extends InferType<typeof finishSignUpSchema> {}
+export interface FinishSignUpFormValues extends InferType<typeof finishSignUpSchema> {}
 
 interface FormProps {
   existingEmail: string;
@@ -23,13 +22,7 @@ const FinishSignUpInnerForm: React.FC<FormikProps<FinishSignUpFormValues>> = ({
   return (
     <Form>
       <label htmlFor="email">Email</label>
-      <Field
-        id="email"
-        type="email"
-        name="email"
-        placeholder="annie@mail.org"
-        disabled
-      />
+      <Field id="email" type="email" name="email" placeholder="annie@mail.org" disabled />
 
       <label htmlFor="password">Password</label>
       <Field id="password" name="password" type="password" />
@@ -37,9 +30,7 @@ const FinishSignUpInnerForm: React.FC<FormikProps<FinishSignUpFormValues>> = ({
 
       <label htmlFor="passwordRepeat">Repeat Password</label>
       <Field id="passwordRepeat" name="passwordRepeat" type="password" />
-      {touched.passwordRepeat && errors.passwordRepeat && (
-        <div>{errors.passwordRepeat}</div>
-      )}
+      {touched.passwordRepeat && errors.passwordRepeat && <div>{errors.passwordRepeat}</div>}
 
       <button type="submit" disabled={isSubmitting}>
         Submit
