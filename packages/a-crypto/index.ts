@@ -6,8 +6,7 @@ export interface FileStream {
   file?: File | Blob;
 }
 
-export interface EncryptedFileStream
-  extends Omit<FileStream, "file" | "stream"> {
+export interface EncryptedFileStream extends Omit<FileStream, "file" | "stream"> {
   encryptedFileStream: ReadableStream<Uint8Array>;
   decryptionHeader: Uint8Array<ArrayBufferLike>;
 }

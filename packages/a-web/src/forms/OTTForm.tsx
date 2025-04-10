@@ -1,5 +1,5 @@
 import { Field, Form, FormikProps, withFormik } from "formik";
-import { object, string, InferType } from "yup";
+import { InferType, object, string } from "yup";
 
 const ottSchema = object({
   email: string().email().required(),

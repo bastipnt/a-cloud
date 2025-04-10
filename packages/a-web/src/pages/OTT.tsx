@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import OTTForm, { OTTFormValues } from "../forms/OTTForm";
 import { useClient } from "../hooks/client";
 import { useStorage } from "../hooks/storage";
-import OTTForm, { OTTFormValues } from "../forms/OTTForm";
-import { useEffect, useState } from "react";
 
 const OTT: React.FC = () => {
   const { storeEmail, getEmail } = useStorage();

@@ -6,5 +6,5 @@ export const createCryptoWorker = () =>
     "cryptoWorker",
     new Worker(new URL("../crypto-worker.ts", import.meta.url), {
       type: "module",
-    })
+    }),
   );

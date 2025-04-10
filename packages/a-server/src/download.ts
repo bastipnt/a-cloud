@@ -4,5 +4,5 @@ const dataDir = Bun.env.DATA_DIR;
 
 export const downloadRoutes = new Elysia({ prefix: "/download" }).get(
   "/file/:id",
-  ({ params: { id } }) => Bun.file([dataDir, id].join("/"))
+  ({ params: { id } }) => Bun.file([dataDir, id].join("/")),
 );

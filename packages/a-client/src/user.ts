@@ -15,38 +15,28 @@ type ProofSrpAttributes = {
 };
 
 export const signIn = async (email: string): Promise<ProofSrpAttributes> => {
-  const { srpClientEphemeralPublic, srpClientEphemeralSecret } =
-    genSrpClientEphemeral();
+  const { srpClientEphemeralPublic, srpClientEphemeralSecret } = genSrpClientEphemeral();
 
   const res = await client["user-auth"]["sign-in"].post({
     email,
     srpClientEphemeralPublic,
   });
 
-  if (res.status !== 200 || !res.data)
-    throw new Error("Something went wrong signing in");
+  if (res.status !== 200 || !res.data) throw new Error("Something went wrong signing in");
 
   return { srpClientEphemeralSecret, srpClientEphemeralPublic, ...res.data };
 };
 
-export const proofSignIn = async (
-  password: string,
-  proofSrpAttributes: ProofSrpAttributes
-) => {
-  const {
+export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrpAttributes) => {
+  const { srpSalt, srpClientEphemeralSecret, srpServerEphemeralPublic, srpClientEphemeralPublic } =
+    proofSrpAttributes;
+
+  const { srpClientSessionProof, srpClientSessionKey } = await deriveSrpClientSession(
+    password,
     srpSalt,
     srpClientEphemeralSecret,
     srpServerEphemeralPublic,
-    srpClientEphemeralPublic,
-  } = proofSrpAttributes;
-
-  const { srpClientSessionProof, srpClientSessionKey } =
-    await deriveSrpClientSession(
-      password,
-      srpSalt,
-      srpClientEphemeralSecret,
-      srpServerEphemeralPublic
-    );
+  );
 
   const res = await client["user-auth"]["sign-in"]["verify-srp"].post({
     srpClientSessionProof,
@@ -60,7 +50,7 @@ export const proofSignIn = async (
     srpClientEphemeralPublic,
     srpClientSessionProof,
     srpClientSessionKey,
-    srpServerSessionProof
+    srpServerSessionProof,
   );
 };
 

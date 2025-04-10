@@ -10,10 +10,7 @@ export const readFileToStream = async (file: File): Promise<FileStream> => {
 
   let pending: Uint8Array | undefined;
   const transformer = new TransformStream<Uint8Array, Uint8Array>({
-    async transform(
-      chunk: Uint8Array,
-      controller: TransformStreamDefaultController
-    ) {
+    async transform(chunk: Uint8Array, controller: TransformStreamDefaultController) {
       let next: Uint8Array;
       if (pending) {
         next = new Uint8Array(pending.length + chunk.length);

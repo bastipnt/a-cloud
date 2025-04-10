@@ -1,12 +1,12 @@
-import Elysia, { t } from "elysia";
-import { db } from "./db";
-import { usersTable } from "./db/schema/users";
-import { keysTable } from "./db/schema/keys";
 import { encryptBoxBase64, genOTT, getHashBase64 } from "a-crypto";
+import Elysia, { t } from "elysia";
 import { serverKeys } from "../config";
-import { authPlugin } from "./plugins/authPlugin";
+import { db } from "./db";
+import { keysTable } from "./db/schema/keys";
 import { ottsTable } from "./db/schema/otts";
 import { srpsTable } from "./db/schema/srps";
+import { usersTable } from "./db/schema/users";
+import { authPlugin } from "./plugins/authPlugin";
 import { srpServer } from "./srpServer";
 
 const srpState: {
@@ -94,7 +94,7 @@ class UserAuthController {
 
     const [encryptedEmail, emailNonce] = await encryptBoxBase64(
       btoa(email),
-      serverKeys.encryptionKey
+      serverKeys.encryptionKey,
     );
 
     const emailHash = await getHashBase64(email, serverKeys.hashingKey);
@@ -124,18 +124,12 @@ class UserAuthController {
   }
 
   async verifyOTT(signInParams: { email: string; ott: string }) {
-    const emailHash = await getHashBase64(
-      signInParams.email,
-      serverKeys.hashingKey
-    );
+    const emailHash = await getHashBase64(signInParams.email, serverKeys.hashingKey);
 
     const res = await db.query.ottsTable.findFirst({
       columns: {},
       where: (ottRow, { eq, and, gte }) =>
-        and(
-          eq(ottRow.ott, signInParams.ott),
-          gte(ottRow.expiresAt, new Date())
-        ),
+        and(eq(ottRow.ott, signInParams.ott), gte(ottRow.expiresAt, new Date())),
       with: {
         user: {
           columns: {
@@ -153,8 +147,7 @@ class UserAuthController {
 
     if (user.emailHash !== emailHash) throw new Error("Email is incorrect");
 
-    if (!user.hasEmailVerified)
-      await db.update(usersTable).set({ hasEmailVerified: true });
+    if (!user.hasEmailVerified) await db.update(usersTable).set({ hasEmailVerified: true });
 
     return user.userId;
   }
@@ -193,7 +186,7 @@ class UserAuthController {
     srpClientEphemeralPublic: string,
     srpSalt: string,
     srpVerifier: string,
-    srpClientSessionProof: string
+    srpClientSessionProof: string,
   ) {
     const srpServerSession = await srpServer.deriveSession(
       srpServerEphemeralSecret,
@@ -201,7 +194,7 @@ class UserAuthController {
       srpSalt,
       "",
       srpVerifier,
-      srpClientSessionProof
+      srpClientSessionProof,
     );
 
     return srpServerSession;
@@ -228,8 +221,7 @@ export const userAuthService = new Elysia({ name: "user-auth/service" })
 
       onBeforeHandle(async ({ error, jwt, cookie: { auth } }) => {
         const value = await jwt.verify(auth.value);
-        if (!value)
-          return error(401, { success: false, message: "Unauthorized" });
+        if (!value) return error(401, { success: false, message: "Unauthorized" });
       });
     },
 
@@ -240,8 +232,7 @@ export const userAuthService = new Elysia({ name: "user-auth/service" })
         const value = await jwt.verify(tmpOTTAuth.value);
         console.log(value);
 
-        if (!value)
-          return error(401, { success: false, message: "Unauthorized" });
+        if (!value) return error(401, { success: false, message: "Unauthorized" });
       });
     },
   }));
@@ -281,20 +272,14 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
     },
     {
       body: "signUpUserParams",
-    }
+    },
   )
   /**
    * Used to verify the email address initially
    */
   .post(
     "/verify-ott",
-    async ({
-      userAuthController,
-      body: { email, ott },
-      error,
-      cookie: { tmpOTTAuth },
-      jwt,
-    }) => {
+    async ({ userAuthController, body: { email, ott }, error, cookie: { tmpOTTAuth }, jwt }) => {
       let userId: string;
 
       try {
@@ -319,7 +304,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
       return { message: "email verified" };
     },
-    { body: "verifyOTTParams" }
+    { body: "verifyOTTParams" },
   )
   .post(
     "/sign-in",
@@ -363,7 +348,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
     },
     {
       body: "signInParams",
-    }
+    },
   )
   .post(
     "/sign-in/verify-srp",
@@ -393,11 +378,10 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
         srpClientEphemeralPublic,
         srpSalt,
         srpVerifier,
-        srpClientSessionProof
+        srpClientSessionProof,
       );
 
-      const { proof: srpServerSessionProof, key: srpServerSessionKey } =
-        srpServerSession;
+      const { proof: srpServerSessionProof, key: srpServerSessionKey } = srpServerSession;
 
       // Remove user srp session from tmp store
       store.srp = store.srp.filter((srp) => srp.userId !== userId);
@@ -421,7 +405,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
         srpServerSessionProof,
       };
     },
-    { body: "signInVerifySrpParams" }
+    { body: "signInVerifySrpParams" },
   )
   .use(withOTTtmpUserId)
   .put(
@@ -432,5 +416,5 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
       return { status: 200, message: "success" };
     },
-    { body: "finishSignUpParams" }
+    { body: "finishSignUpParams" },
   );

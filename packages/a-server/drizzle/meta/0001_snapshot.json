@@ -63,12 +63,8 @@
           "name": "files_ownerId_users_userId_fk",
           "tableFrom": "files",
           "tableTo": "users",
-          "columnsFrom": [
-            "ownerId"
-          ],
-          "columnsTo": [
-            "userId"
-          ],
+          "columnsFrom": ["ownerId"],
+          "columnsTo": ["userId"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -180,12 +176,8 @@
           "name": "keys_userId_users_userId_fk",
           "tableFrom": "keys",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "userId"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["userId"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -231,12 +223,8 @@
           "name": "otts_userId_users_userId_fk",
           "tableFrom": "otts",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "userId"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["userId"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -282,12 +270,8 @@
           "name": "srps_userId_users_userId_fk",
           "tableFrom": "srps",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "userId"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["userId"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -352,16 +336,12 @@
         "users_encryptedEmail_unique": {
           "name": "users_encryptedEmail_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "encryptedEmail"
-          ]
+          "columns": ["encryptedEmail"]
         },
         "users_emailHash_unique": {
           "name": "users_emailHash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "emailHash"
-          ]
+          "columns": ["emailHash"]
         }
       },
       "policies": {},

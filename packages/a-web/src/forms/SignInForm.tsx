@@ -1,5 +1,5 @@
 import { Field, Form, FormikProps, withFormik } from "formik";
-import { object, string, InferType } from "yup";
+import { InferType, object, string } from "yup";
 
 const signInSchema = object({
   email: string().email().required(),
@@ -21,12 +21,7 @@ const SignInInnerForm: React.FC<FormikProps<SignInFormValues>> = ({
   return (
     <Form>
       <label htmlFor="email">Email</label>
-      <Field
-        id="email"
-        type="email"
-        name="email"
-        placeholder="annie@mail.org"
-      />
+      <Field id="email" type="email" name="email" placeholder="annie@mail.org" />
       {touched.email && errors.email && <div>{errors.email}</div>}
 
       <label htmlFor="password">Password</label>

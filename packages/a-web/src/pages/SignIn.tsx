@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import SignInForm, { SignInFormValues } from "../forms/SignInForm";
 import { useClient } from "../hooks/client";
 import { useStorage } from "../hooks/storage";
-import { useEffect, useState } from "react";
-import SignInForm, { SignInFormValues } from "../forms/SignInForm";
 
 const SignIn: React.FC = () => {
   const { getEmail } = useStorage();

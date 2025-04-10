@@ -1,5 +1,5 @@
-import Elysia, { t } from "elysia";
 import { randomUUIDv7 } from "bun";
+import Elysia, { t } from "elysia";
 
 const dataDir = Bun.env.DATA_DIR;
 
@@ -15,5 +15,5 @@ export const uploadRoutes = new Elysia({ prefix: "/upload" }).post(
     body: t.Object({
       file: t.File(),
     }),
-  }
+  },
 );

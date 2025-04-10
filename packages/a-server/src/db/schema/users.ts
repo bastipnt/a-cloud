@@ -1,9 +1,8 @@
-import { boolean, pgTable, varchar, timestamp } from "drizzle-orm/pg-core";
-import { getDateNow } from "../helpers/default-value-helpers";
 import { relations } from "drizzle-orm";
-
-import { keysTable } from "./keys";
+import { boolean, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { getDateNow } from "../helpers/default-value-helpers";
 import { filesTable } from "./files";
+import { keysTable } from "./keys";
 import { ottsTable } from "./otts";
 import { srpsTable } from "./srps";
 

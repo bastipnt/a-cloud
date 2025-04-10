@@ -1,5 +1,5 @@
 import { Field, Form, FormikProps, withFormik } from "formik";
-import { object, string, InferType } from "yup";
+import { InferType, object, string } from "yup";
 
 const signUpSchema = object({
   email: string().email().required(),
@@ -19,12 +19,7 @@ const SignUpInnerForm: React.FC<FormikProps<SignUpFormValues>> = ({
   return (
     <Form>
       <label htmlFor="email">Email</label>
-      <Field
-        id="email"
-        type="email"
-        name="email"
-        placeholder="annie@mail.org"
-      />
+      <Field id="email" type="email" name="email" placeholder="annie@mail.org" />
       {touched.email && errors.email && <div>{errors.email}</div>}
 
       <button type="submit" disabled={isSubmitting}>

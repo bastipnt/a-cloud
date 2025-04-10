@@ -1,11 +1,11 @@
 import "./App.css";
 import { Route, Switch } from "wouter";
 import Layout from "./Layout";
-import Index from "./pages/Index";
-import SignUp from "./pages/SignUp";
-import SignIn from "./pages/SignIn";
-import OTT from "./pages/OTT";
 import FinishSignUp from "./pages/FinishSignUp";
+import Index from "./pages/Index";
+import OTT from "./pages/OTT";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 
 function App() {
   // const { downloadFile } = useClient();

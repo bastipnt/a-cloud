@@ -1,5 +1,5 @@
-import Elysia, { t } from "elysia";
 import jwt from "@elysiajs/jwt";
+import Elysia, { t } from "elysia";
 import { jwtSecret } from "../../config";
 
 export const authPlugin = new Elysia()
@@ -8,7 +8,7 @@ export const authPlugin = new Elysia()
       name: "jwt",
       secret: jwtSecret,
       exp: "7d",
-    })
+    }),
   )
   .derive({ as: "scoped" }, ({ jwt }) => {
     return { jwt };
@@ -19,7 +19,7 @@ export const authPlugin = new Elysia()
         auth: t.String(),
         tmpAuth: t.String(),
         tmpOTTAuth: t.String(),
-      })
+      }),
     ),
   });
 // .get("/sign/:name", async ({ jwt, params }) => jwt.sign(params));

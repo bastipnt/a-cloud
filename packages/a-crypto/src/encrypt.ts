@@ -1,8 +1,8 @@
 import sodium from "libsodium-wrappers-sumo";
 import { type EncryptedFileStream } from "..";
-import { readFileToStream } from "./util/file-helper";
-import { fromBase64, toBase64 } from "./util/conversion-helper";
 import { genNonce } from "./generate";
+import { fromBase64, toBase64 } from "./util/conversion-helper";
+import { readFileToStream } from "./util/file-helper";
 
 const genOrGetKey = (): Uint8Array => {
   const encryptionKey = localStorage.getItem("encryptionKey");
@@ -24,13 +24,11 @@ export const encryptFile = async (file: File): Promise<EncryptedFileStream> => {
   await sodium.ready;
 
   const key = genOrGetKey();
-  const initPushRes =
-    sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
+  const initPushRes = sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
   const [pushState, header] = [initPushRes.state, initPushRes.header];
   setHeader(header);
 
-  const { stream, chunkCount, fileSize, lastModifiedMs } =
-    await readFileToStream(file);
+  const { stream, chunkCount, fileSize, lastModifiedMs } = await readFileToStream(file);
 
   const fileStreamReader = stream.getReader();
   const ref = { pullCount: 1 };
@@ -45,13 +43,12 @@ export const encryptFile = async (file: File): Promise<EncryptedFileStream> => {
         ? sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL
         : sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE;
 
-      const encryptedFileChunk =
-        sodium.crypto_secretstream_xchacha20poly1305_push(
-          pushState,
-          value,
-          null,
-          tag
-        );
+      const encryptedFileChunk = sodium.crypto_secretstream_xchacha20poly1305_push(
+        pushState,
+        value,
+        null,
+        tag,
+      );
 
       controller.enqueue(encryptedFileChunk);
 
@@ -79,7 +76,7 @@ export const encryptBoxBase64 = async (data: string, key: string) => {
   const encryptedData = sodium.crypto_secretbox_easy(
     await fromBase64(data),
     nonce,
-    await fromBase64(key)
+    await fromBase64(key),
   );
 
   return [await toBase64(encryptedData), await toBase64(nonce)];

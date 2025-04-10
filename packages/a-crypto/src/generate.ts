@@ -1,7 +1,7 @@
 import sodium from "libsodium-wrappers-sumo";
-import { fromBase64, toBase64 } from "./util/conversion-helper";
-import { encryptBoxBase64 } from "./encrypt";
 import type { UserKeys } from "../types";
+import { encryptBoxBase64 } from "./encrypt";
+import { fromBase64, toBase64 } from "./util/conversion-helper";
 
 export const genRandomBytesBase64 = async (lenBytes: number) => {
   await sodium.ready;
@@ -30,7 +30,7 @@ export const deriveKeyBase64 = async (
   userPassword: string,
   salt: string,
   opsLimit: number,
-  memLimit: number
+  memLimit: number,
 ) => {
   await sodium.ready;
   return await toBase64(
@@ -40,26 +40,21 @@ export const deriveKeyBase64 = async (
       await fromBase64(salt),
       opsLimit,
       memLimit,
-      sodium.crypto_pwhash_ALG_ARGON2ID13
-    )
+      sodium.crypto_pwhash_ALG_ARGON2ID13,
+    ),
   );
 };
 
-export const deriveSensitiveKeyBase64 = async (
-  userPassword: string,
-  salt: string
-) => {
+export const deriveSensitiveKeyBase64 = async (userPassword: string, salt: string) => {
   await sodium.ready;
 
   const desiredStrength =
-    sodium.crypto_pwhash_MEMLIMIT_SENSITIVE *
-    sodium.crypto_pwhash_OPSLIMIT_SENSITIVE;
+    sodium.crypto_pwhash_MEMLIMIT_SENSITIVE * sodium.crypto_pwhash_OPSLIMIT_SENSITIVE;
 
   let memLimit = sodium.crypto_pwhash_MEMLIMIT_MODERATE; // = 256 MB
 
   const factor = Math.floor(
-    sodium.crypto_pwhash_MEMLIMIT_SENSITIVE /
-      sodium.crypto_pwhash_MEMLIMIT_MODERATE
+    sodium.crypto_pwhash_MEMLIMIT_SENSITIVE / sodium.crypto_pwhash_MEMLIMIT_MODERATE,
   ); // = 4
 
   let opsLimit = sodium.crypto_pwhash_OPSLIMIT_SENSITIVE * factor; // = 16
@@ -89,10 +84,7 @@ export const genKeyPairBase64 = async (): Promise<[string, string]> => {
   await sodium.ready;
 
   const keyPair = sodium.crypto_box_keypair();
-  return [
-    await toBase64(keyPair.publicKey),
-    await toBase64(keyPair.privateKey),
-  ];
+  return [await toBase64(keyPair.publicKey), await toBase64(keyPair.privateKey)];
 };
 
 /**
@@ -100,36 +92,24 @@ export const genKeyPairBase64 = async (): Promise<[string, string]> => {
  * @param userPassword
  * @returns UserKeys for new user
  */
-export const genNewUserKeys = async (
-  userPassword: string
-): Promise<UserKeys> => {
+export const genNewUserKeys = async (userPassword: string): Promise<UserKeys> => {
   const mainKey = await genEncryptionKeyBase64();
   const recoveryKey = await genEncryptionKeyBase64();
 
   const keyEncryptionKeySalt = await genSaltBase64();
-  const keyEncryptionKey = await deriveSensitiveKeyBase64(
-    userPassword,
-    keyEncryptionKeySalt
-  );
+  const keyEncryptionKey = await deriveSensitiveKeyBase64(userPassword, keyEncryptionKeySalt);
 
-  const [encryptedMainKey, mainKeyNonce] = await encryptBoxBase64(
+  const [encryptedMainKey, mainKeyNonce] = await encryptBoxBase64(mainKey, keyEncryptionKey.key);
+
+  const [encryptedMainKeyWithRecoveryKey, mainKeyWithRecoveryKeyNonce] = await encryptBoxBase64(
     mainKey,
-    keyEncryptionKey.key
-  );
-
-  const [encryptedMainKeyWithRecoveryKey, mainKeyWithRecoveryKeyNonce] =
-    await encryptBoxBase64(mainKey, recoveryKey);
-
-  const [encryptedRecoveryKey, recoveryKeyNonce] = await encryptBoxBase64(
     recoveryKey,
-    mainKey
   );
+
+  const [encryptedRecoveryKey, recoveryKeyNonce] = await encryptBoxBase64(recoveryKey, mainKey);
 
   const [privateKey, publicKey] = await genKeyPairBase64();
-  const [encryptedPrivateKey, privateKeyNonce] = await encryptBoxBase64(
-    privateKey,
-    mainKey
-  );
+  const [encryptedPrivateKey, privateKeyNonce] = await encryptBoxBase64(privateKey, mainKey);
 
   return {
     keyEncryptionKeySalt,

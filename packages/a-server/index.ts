@@ -1,8 +1,8 @@
-import { Elysia } from "elysia";
-import { uploadRoutes } from "./src/upload";
 import { cors } from "@elysiajs/cors";
-import { downloadRoutes } from "./src/download";
+import { Elysia } from "elysia";
 import { migrateDB } from "./src/db";
+import { downloadRoutes } from "./src/download";
+import { uploadRoutes } from "./src/upload";
 import { userRoutes } from "./src/user";
 import { userAuthRoutes } from "./src/userAuth";
 
@@ -14,7 +14,7 @@ export const app = new Elysia()
       allowedHeaders: ["Content-Type"],
       credentials: true,
       origin: "localhost:5173",
-    })
+    }),
   )
   .use(userAuthRoutes)
   .use(userRoutes)
@@ -23,8 +23,6 @@ export const app = new Elysia()
 
 app.listen(3000);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 
 export type App = typeof app;

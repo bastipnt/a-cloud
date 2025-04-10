@@ -1,7 +1,7 @@
-import { pgTable, varchar, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow, getFutureDate } from "../helpers/default-value-helpers";
 import { usersTable } from "./users";
-import { relations } from "drizzle-orm";
 
 export const ottsTable = pgTable("otts", {
   userId: varchar()

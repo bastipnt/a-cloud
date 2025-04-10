@@ -1,5 +1,4 @@
 import Elysia from "elysia";
-
 import { authPlugin } from "./plugins/authPlugin";
 
 class UserController {}
@@ -12,8 +11,7 @@ export const userService = new Elysia({ name: "user/service" })
 
       onBeforeHandle(async ({ error, jwt, cookie: { auth } }) => {
         const value = await jwt.verify(auth.value);
-        if (!value)
-          return error(401, { success: false, message: "Unauthorized" });
+        if (!value) return error(401, { success: false, message: "Unauthorized" });
       });
     },
   }));

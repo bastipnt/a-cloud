@@ -1,16 +1,13 @@
 import { FormEvent, useState } from "react";
-import { useStorage } from "../hooks/storage";
 import { useClient } from "../hooks/client";
+import { useStorage } from "../hooks/storage";
 
 type Validation = {
   valid: boolean;
   errors: string[];
 };
 
-const validatePassword = (
-  password: string | null,
-  passwordRepeat: string | null
-): Validation => {
+const validatePassword = (password: string | null, passwordRepeat: string | null): Validation => {
   if (!password) return { valid: false, errors: ["Password not provided"] };
   if (password !== passwordRepeat)
     return {

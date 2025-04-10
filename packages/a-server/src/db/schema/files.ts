@@ -1,7 +1,7 @@
-import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { usersTable } from "./users";
+import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow } from "../helpers/default-value-helpers";
+import { usersTable } from "./users";
 
 export const filesTable = pgTable("files", {
   fileId: varchar()

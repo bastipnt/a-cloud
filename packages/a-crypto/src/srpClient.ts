@@ -1,4 +1,5 @@
 import { createSRPClient } from "@swan-io/srp";
+
 const srpClient = createSRPClient("SHA-256", 2048);
 
 export const genSrpAttributes = async (password: string) => {
@@ -22,7 +23,7 @@ export const deriveSrpClientSession = async (
   password: string,
   srpSalt: string,
   srpClientEphemeralSecret: string,
-  srpServerEphemeralPublic: string
+  srpServerEphemeralPublic: string,
 ) => {
   const srpPrivateKey = await srpClient.deriveSafePrivateKey(srpSalt, password);
 
@@ -31,7 +32,7 @@ export const deriveSrpClientSession = async (
     srpServerEphemeralPublic,
     srpSalt,
     "",
-    srpPrivateKey
+    srpPrivateKey,
   );
 
   return {
@@ -44,11 +45,11 @@ export const verifySrpSession = async (
   srpClientEphemeralPublic: string,
   srpClientSessionProof: string,
   srpClientSessionKey: string,
-  srpServerSessionProof: string
+  srpServerSessionProof: string,
 ) => {
   await srpClient.verifySession(
     srpClientEphemeralPublic,
     { proof: srpClientSessionProof, key: srpClientSessionKey },
-    srpServerSessionProof
+    srpServerSessionProof,
   );
 };

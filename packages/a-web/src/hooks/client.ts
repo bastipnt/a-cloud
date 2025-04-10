@@ -1,12 +1,12 @@
 import {
-  uploadStream,
   downloadFile,
-  signUp,
   finishSignUp,
-  verifyOTT,
-  signIn,
-  proofSignIn,
   getUser,
+  proofSignIn,
+  signIn,
+  signUp,
+  uploadStream,
+  verifyOTT,
 } from "a-client";
 
 export const useClient = () => {

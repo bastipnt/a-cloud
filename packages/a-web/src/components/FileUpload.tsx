@@ -1,6 +1,6 @@
+import { AFile } from "a-media";
 import { ChangeEvent, useState } from "react";
 import { useClient } from "../hooks/client";
-import { AFile } from "a-media";
 import { useCrypto } from "../hooks/crypto";
 
 const FileUploadSingle: React.FC = () => {

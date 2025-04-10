@@ -1,7 +1,7 @@
+import { relations } from "drizzle-orm";
 import { integer, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow } from "../helpers/default-value-helpers";
 import { usersTable } from "./users";
-import { relations } from "drizzle-orm";
 
 export const keysTable = pgTable("keys", {
   id: varchar()

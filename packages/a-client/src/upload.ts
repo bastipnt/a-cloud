@@ -3,7 +3,7 @@ import type { EncryptedFileStream } from "a-crypto";
 import { client } from "..";
 
 const combineChunksToFormUploadPart = async (
-  streamReader: ReadableStreamDefaultReader<Uint8Array>
+  streamReader: ReadableStreamDefaultReader<Uint8Array>,
 ) => {
   const combinedChunks: Uint8Array<ArrayBufferLike>[] = [];
 

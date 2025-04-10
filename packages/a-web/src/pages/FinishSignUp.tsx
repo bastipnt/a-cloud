@@ -1,10 +1,8 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import FinishSignUpForm, { FinishSignUpFormValues } from "../forms/FinishSignUpForm";
 import { useClient } from "../hooks/client";
 import { useStorage } from "../hooks/storage";
-import FinishSignUpForm, {
-  FinishSignUpFormValues,
-} from "../forms/FinishSignUpForm";
-import { useEffect, useState } from "react";
 
 const FinishSignUp: React.FC = () => {
   const { getEmail } = useStorage();
@@ -31,10 +29,7 @@ const FinishSignUp: React.FC = () => {
   return (
     <>
       <h1>FinishSignUp</h1>
-      <FinishSignUpForm
-        handleSubmit={handleSubmit}
-        existingEmail={existingEmail}
-      />
+      <FinishSignUpForm handleSubmit={handleSubmit} existingEmail={existingEmail} />
     </>
   );
 };

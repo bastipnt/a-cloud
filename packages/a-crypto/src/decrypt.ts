@@ -1,5 +1,5 @@
-import sodium from "libsodium-wrappers-sumo";
 import { mergeUint8Arrays } from "a-common";
+import sodium from "libsodium-wrappers-sumo";
 import { streamEncryptionChunkSize, type FileStream } from "..";
 import { readFileToStream } from "./util/file-helper";
 
@@ -23,23 +23,17 @@ const getKey = (): Uint8Array | undefined => {
   return new Uint8Array(JSON.parse(encryptionKey));
 };
 
-export const decryptFile = async (
-  encryptedFile: Uint8Array
-): Promise<Uint8Array | undefined> => {
+export const decryptFile = async (encryptedFile: Uint8Array): Promise<Uint8Array | undefined> => {
   await sodium.ready;
 
   const header = getHeader();
   const key = getKey();
   if (!header || !key) return;
 
-  const pullState = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
-    header,
-    key
-  );
+  const pullState = sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, key);
 
   const decryptionChunkSize =
-    streamEncryptionChunkSize +
-    sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+    streamEncryptionChunkSize + sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
   let bytesRead = 0;
   const decryptedChunks = [];
 
@@ -50,10 +44,7 @@ export const decryptFile = async (
       chunkSize = encryptedFile.length - bytesRead;
     }
     const buffer = encryptedFile.slice(bytesRead, bytesRead + chunkSize);
-    const pullResult = sodium.crypto_secretstream_xchacha20poly1305_pull(
-      pullState,
-      buffer
-    );
+    const pullResult = sodium.crypto_secretstream_xchacha20poly1305_pull(pullState, buffer);
     decryptedChunks.push(pullResult.message);
     tag = pullResult.tag;
     bytesRead += chunkSize;

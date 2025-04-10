@@ -10,7 +10,7 @@ interface PartEtag {
 const multipartChunksPerPart = 5;
 
 const combineChunksToFormUploadPart = async (
-  streamReader: ReadableStreamDefaultReader<Uint8Array>
+  streamReader: ReadableStreamDefaultReader<Uint8Array>,
 ) => {
   const combinedChunks = [];
   for (let i = 0; i < multipartChunksPerPart; i++) {
@@ -23,9 +23,7 @@ const combineChunksToFormUploadPart = async (
   return mergeUint8Arrays(combinedChunks);
 };
 
-export const multipartStreamUpload = async (
-  encryptedFile: EncryptedFileStream
-) => {
+export const multipartStreamUpload = async (encryptedFile: EncryptedFileStream) => {
   const { chunkCount, encryptedFileStream } = encryptedFile;
 
   const uploadPartCount = Math.ceil(chunkCount / multipartChunksPerPart);
