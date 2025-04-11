@@ -12,7 +12,8 @@
     "check": "prettier --check ."
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "sites/*"
   ],
   "devDependencies": {
     "@eslint/css": "^0.6.0",
