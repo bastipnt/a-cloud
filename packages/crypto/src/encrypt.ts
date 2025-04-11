@@ -73,11 +73,23 @@ export const encryptBoxBase64 = async (data: string, key: string): Promise<[stri
 
   const nonce = await genNonce();
 
+  const encryptedData = await encryptBoxWithNonceBase64(data, key, nonce);
+
+  return [encryptedData, await toBase64(nonce)];
+};
+
+export const encryptBoxWithNonceBase64 = async (
+  data: string,
+  key: string,
+  nonce: Uint8Array,
+): Promise<string> => {
+  await sodium.ready;
+
   const encryptedData = sodium.crypto_secretbox_easy(
     await fromBase64(data),
     nonce,
     await fromBase64(key),
   );
 
-  return [await toBase64(encryptedData), await toBase64(nonce)];
+  return await toBase64(encryptedData);
 };

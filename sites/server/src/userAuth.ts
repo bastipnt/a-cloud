@@ -265,10 +265,10 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
   })
   .put(
     "/sign-up",
-    async ({ body: { email }, userAuthController }) => {
+    async ({ body: { email }, userAuthController }): Promise<AResponse> => {
       await userAuthController.signUp({ email });
 
-      return { status: 200, message: "success" };
+      return { message: "signed up" };
     },
     {
       body: "signUpUserParams",

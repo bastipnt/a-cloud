@@ -1,2 +1,1 @@
-[test]
-preload = ["./sites/web/happydom.ts", "./sites/server/src/db/index-mock.ts"]
+telemetry = false

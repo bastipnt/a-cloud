@@ -6,7 +6,7 @@ import { userRoutes } from "./user";
 const api = treaty(userRoutes);
 
 describe("user routes", () => {
-  describe("GET /", () => {
+  describe("[GET] /", () => {
     describe("signed in", () => {
       it("returns an existing userId", async () => {
         const { data } = await api.user.index.get({

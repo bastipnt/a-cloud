@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
     "preview": "vite preview"
   },
   "dependencies": {

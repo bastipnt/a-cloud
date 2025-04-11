@@ -5,16 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch index.ts",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
     "gen-migrations": "bunx drizzle-kit generate --config drizzle.config.ts",
     "migrate": "bun run ./src/db/migrate.ts"
   },
   "dependencies": {
+    "@acloud/crypto": "workspace:*",
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/jwt": "^1.2.0",
     "@swan-io/srp": "^0.2.6",
-    "@acloud/crypto": "workspace:*",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.41.0",
+    "drizzle-seed": "^0.3.1",
     "elysia": "latest",
     "js-yaml": "^4.1.0",
     "pg": "^8.14.1"
