@@ -4,7 +4,6 @@
   "version": "1.0.50",
   "type": "module",
   "scripts": {
-    "test": "bun test",
     "dev": "bun run --watch index.ts",
     "gen-migrations": "bunx drizzle-kit generate --config drizzle.config.ts",
     "migrate": "bun run ./src/db/migrate.ts"

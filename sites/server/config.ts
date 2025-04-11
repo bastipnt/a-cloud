@@ -47,7 +47,7 @@ interface ServerConfig {
   internal: Internal;
 }
 
-const configPath = resolve("../../config.yaml");
+const configPath = resolve(__dirname, "../../config.yaml");
 const rawConfig = await Bun.file(configPath).text();
 const config = load(rawConfig) as ServerConfig;
 

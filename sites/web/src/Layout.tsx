@@ -5,7 +5,7 @@ type Props = {
 };
 
 const Layout: React.FC<Props> = ({ children }) => {
-  return <>{children}</>;
+  return <main>{children}</main>;
 };
 
 export default Layout;
