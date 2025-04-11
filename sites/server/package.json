@@ -20,6 +20,7 @@
     "pg": "^8.14.1"
   },
   "devDependencies": {
+    "@elysiajs/eden": "^1.2.0",
     "@types/bun": "^1.2.8",
     "@types/js-yaml": "^4.0.9",
     "@types/pg": "^8.11.11",
