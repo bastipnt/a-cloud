@@ -7,7 +7,7 @@ import {
   signUp,
   uploadStream,
   verifyOTT,
-} from "a-client";
+} from "@acloud/client";
 
 export const useClient = () => {
   return {

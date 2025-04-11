@@ -1,5 +1,6 @@
 {
-  "name": "a-server",
+  "name": "@acloud/server",
+  "private": true,
   "version": "1.0.50",
   "type": "module",
   "scripts": {
@@ -12,7 +13,7 @@
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/jwt": "^1.2.0",
     "@swan-io/srp": "^0.2.6",
-    "a-crypto": "workspace:*",
+    "@acloud/crypto": "workspace:*",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.41.0",
     "elysia": "latest",

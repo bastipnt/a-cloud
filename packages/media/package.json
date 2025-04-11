@@ -1,5 +1,6 @@
 {
-  "name": "a-media",
+  "name": "@acloud/media",
+  "private": true,
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
@@ -10,8 +11,8 @@
   },
   "dependencies": {
     "elysia": "^1.2.25",
-    "a-crypto": "workspace:*",
-    "a-common": "workspace:*",
-    "a-server": "workspace:*"
+    "@acloud/crypto": "workspace:*",
+    "@acloud/common": "workspace:*",
+    "@acloud/server": "workspace:*"
   }
 }

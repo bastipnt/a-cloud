@@ -1,5 +1,6 @@
 {
-  "name": "a-common",
+  "name": "@acloud/common",
+  "private": true,
   "module": "index.ts",
   "devDependencies": {
     "@types/bun": "latest"

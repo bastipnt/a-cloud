@@ -1,4 +1,4 @@
-import { encryptBoxBase64, genOTT, getHashBase64 } from "a-crypto";
+import { encryptBoxBase64, genOTT, getHashBase64 } from "@acloud/crypto";
 import Elysia, { t } from "elysia";
 import { serverKeys } from "../config";
 import { db } from "./db";

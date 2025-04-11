@@ -1,4 +1,4 @@
-import { AFile } from "a-media";
+import { AFile } from "@acloud/media";
 import { ChangeEvent, useState } from "react";
 import { useClient } from "../hooks/client";
 import { useCrypto } from "../hooks/crypto";

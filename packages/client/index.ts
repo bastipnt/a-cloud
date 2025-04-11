@@ -1,5 +1,5 @@
+import type { App } from "@acloud/server";
 import { treaty } from "@elysiajs/eden";
-import type { App } from "a-server";
 
 export const client = treaty<App>("localhost:3000", {
   fetch: { credentials: "include" },

@@ -1,5 +1,6 @@
 {
-  "name": "a-crypto",
+  "name": "@acloud/crypto",
+  "private": true,
   "module": "index.ts",
   "scripts": {
     "gen-keys": "bun run generate-server-keys.ts"

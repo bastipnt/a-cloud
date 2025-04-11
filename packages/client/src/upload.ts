@@ -1,5 +1,5 @@
-import { mergeUint8Arrays } from "a-common";
-import type { EncryptedFileStream } from "a-crypto";
+import { mergeUint8Arrays } from "@acloud/common";
+import type { EncryptedFileStream } from "@acloud/crypto";
 import { client } from "..";
 
 const combineChunksToFormUploadPart = async (

@@ -6,8 +6,6 @@ import { uploadRoutes } from "./src/upload";
 import { userRoutes } from "./src/user";
 import { userAuthRoutes } from "./src/userAuth";
 
-document.getElementById("hello");
-
 migrateDB();
 
 export const app = new Elysia()

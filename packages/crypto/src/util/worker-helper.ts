@@ -1,4 +1,4 @@
-import { ComlinkWorker } from "a-common";
+import { ComlinkWorker } from "@acloud/common";
 import type { CryptoWorker } from "../crypto-worker";
 
 export const createCryptoWorker = () =>

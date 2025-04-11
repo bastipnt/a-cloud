@@ -1,4 +1,4 @@
-import { mergeUint8Arrays } from "a-common";
+import { mergeUint8Arrays } from "@acloud/common";
 import sodium from "libsodium-wrappers-sumo";
 import { streamEncryptionChunkSize, type FileStream } from "..";
 import { readFileToStream } from "./util/file-helper";

@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n server,web -c green,magenta \"bun dev:server\" \"bun dev:web\"",
-    "dev:server": "bun --filter 'a-server' dev",
+    "dev:server": "bun --filter '@acloud/server' dev",
     "dev:web": "bun --filter '@acloud/web' dev",
     "build": "bun --filter '*' build",
     "test": "bun --filter '*' test",

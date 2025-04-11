@@ -4,7 +4,7 @@ import {
   genSrpAttributes,
   genSrpClientEphemeral,
   verifySrpSession,
-} from "a-crypto";
+} from "@acloud/crypto";
 import { client } from "..";
 
 type ProofSrpAttributes = {

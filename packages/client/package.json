@@ -1,5 +1,6 @@
 {
-  "name": "a-client",
+  "name": "@acloud/client",
+  "private": true,
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
@@ -9,8 +10,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "a-server": "workspace:*",
-    "a-common": "workspace:*",
-    "a-crypto": "workspace:*"
+    "@acloud/server": "workspace:*",
+    "@acloud/common": "workspace:*",
+    "@acloud/crypto": "workspace:*"
   }
 }
