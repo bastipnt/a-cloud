@@ -5,7 +5,7 @@ const signUpSchema = object({
   email: string().email().required(),
 });
 
-export interface SignUpFormValues extends InferType<typeof signUpSchema> {}
+export type SignUpFormValues = InferType<typeof signUpSchema>;
 
 interface FormProps {
   handleSubmit: (values: SignUpFormValues) => Promise<void>;

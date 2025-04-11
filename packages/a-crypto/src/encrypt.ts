@@ -68,7 +68,7 @@ export const encryptFile = async (file: File): Promise<EncryptedFileStream> => {
   };
 };
 
-export const encryptBoxBase64 = async (data: string, key: string) => {
+export const encryptBoxBase64 = async (data: string, key: string): Promise<[string, string]> => {
   await sodium.ready;
 
   const nonce = await genNonce();

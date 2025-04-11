@@ -22,7 +22,10 @@
     "removeComments": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "outDir": "./dist"
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

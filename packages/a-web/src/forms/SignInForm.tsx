@@ -6,7 +6,7 @@ const signInSchema = object({
   password: string().required(),
 });
 
-export interface SignInFormValues extends InferType<typeof signInSchema> {}
+export type SignInFormValues = InferType<typeof signInSchema>;
 
 interface FormProps {
   existingEmail: string;

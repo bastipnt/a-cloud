@@ -6,7 +6,7 @@ const ottSchema = object({
   ott: string().required().min(6).max(6), // TODO: regex
 });
 
-export interface OTTFormValues extends InferType<typeof ottSchema> {}
+export type OTTFormValues = InferType<typeof ottSchema>;
 
 interface FormProps {
   existingEmail?: string;

@@ -158,7 +158,7 @@ export const genOTTAlphaNum = () => {
   const numDigits = 6;
   const digits = "0123456789abcdefghijklmnopqrstuvwxyz";
   let ott = "";
-  let len = digits.length;
+  const len = digits.length;
   for (let i = 0; i < numDigits; i++) {
     ott += digits[Math.floor(Math.random() * len)];
   }

@@ -30,7 +30,7 @@ const OTT: React.FC = () => {
 
     if (email) setExistingEmail(email);
     if (location) setExistingOTT(""); // TODO:
-  }, []);
+  }, [location]);
 
   return (
     <>

@@ -7,7 +7,7 @@ const finishSignUpSchema = object({
   passwordRepeat: string().required(),
 });
 
-export interface FinishSignUpFormValues extends InferType<typeof finishSignUpSchema> {}
+export type FinishSignUpFormValues = InferType<typeof finishSignUpSchema>;
 
 interface FormProps {
   existingEmail: string;

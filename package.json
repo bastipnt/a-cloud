@@ -7,7 +7,7 @@
     "dev:web": "bun --filter '@acloud/web' dev",
     "build": "bun --filter '*' build",
     "test": "bun --filter '*' test",
-    "lint": "bun --filter '*' lint",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "check": "prettier --check ."
   },
@@ -15,9 +15,23 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@eslint/css": "^0.6.0",
+    "@eslint/js": "^9.24.0",
+    "@eslint/json": "^0.11.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
+    "@types/bun": "latest",
     "concurrently": "^9.1.2",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
     "prettier": "3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11"
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "typescript-eslint": "^8.29.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }

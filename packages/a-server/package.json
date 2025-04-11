@@ -1,6 +1,7 @@
 {
   "name": "a-server",
   "version": "1.0.50",
+  "type": "module",
   "scripts": {
     "test": "bun test",
     "dev": "bun run --watch index.ts",

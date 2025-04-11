@@ -1,4 +1,4 @@
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 
 const dataDir = Bun.env.DATA_DIR;
 
