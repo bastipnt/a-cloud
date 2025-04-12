@@ -27,3 +27,5 @@ export const db = drizzle(
 export const migrateDB = () => migrate(db, { migrationsFolder: "./drizzle" });
 
 export const resetDB = () => reset(db, schema);
+
+export { findUserByEmail, findOttByUserId, findUserByUserId } from "./helpers/query-helper";

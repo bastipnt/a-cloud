@@ -1,7 +1,8 @@
 import { encryptBoxBase64, genOTT, getHashBase64 } from "@acloud/crypto";
+import { eq, InferSelectModel } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { serverKeys } from "../config";
-import { db } from "./db";
+import { db, findUserByEmail, findUserByUserId } from "./db";
 import { keysTable } from "./db/schema/keys";
 import { ottsTable } from "./db/schema/otts";
 import { srpsTable } from "./db/schema/srps";
@@ -16,31 +17,35 @@ const srpState: {
   srpVerifier: string;
 }[] = [];
 
+export type SrpParams = {
+  srpSalt: string;
+  srpVerifier: string;
+};
+
+export type KeyParams = {
+  keyEncryptionKeySalt: Base64URLString;
+
+  encryptedMainKey: Base64URLString;
+  mainKeyNonce: Base64URLString;
+
+  encryptedMainKeyWithRecoveryKey: Base64URLString;
+  mainKeyWithRecoveryKeyNonce: Base64URLString;
+
+  encryptedRecoveryKey: Base64URLString;
+  recoveryKeyNonce: Base64URLString;
+
+  encryptedPrivateKey: Base64URLString;
+  privateKeyNonce: Base64URLString;
+  publicKey: string;
+
+  memLimit: number;
+  opsLimit: number;
+};
+
 type FinishSignUpParams = {
-  srpParams: {
-    srpSalt: string;
-    srpVerifier: string;
-  };
+  srpParams: SrpParams;
 
-  keyParams: {
-    keyEncryptionKeySalt: Base64URLString;
-
-    encryptedMainKey: Base64URLString;
-    mainKeyNonce: Base64URLString;
-
-    encryptedMainKeyWithRecoveryKey: Base64URLString;
-    mainKeyWithRecoveryKeyNonce: Base64URLString;
-
-    encryptedRecoveryKey: Base64URLString;
-    recoveryKeyNonce: Base64URLString;
-
-    encryptedPrivateKey: Base64URLString;
-    privateKeyNonce: Base64URLString;
-    publicKey: string;
-
-    memLimit: number;
-    opsLimit: number;
-  };
+  keyParams: KeyParams;
 };
 
 const signUpUserParams = t.Object({
@@ -88,8 +93,18 @@ const finishSignUpParams = t.Object({
   }),
 });
 
+class UserNotFoundError extends Error {
+  override name = "UserNotFoundError";
+}
+
+class UserEmailNotVerifiedError extends Error {
+  override name = "UserEmailNotVerifiedError";
+}
+
 class UserAuthController {
-  async signUp(signUpParams: { email: string }) {
+  async signUp(signUpParams: {
+    email: string;
+  }): Promise<"created" | "updated" | "alreadyVerified"> {
     const { email } = signUpParams;
 
     const [encryptedEmail, emailNonce] = await encryptBoxBase64(
@@ -108,10 +123,22 @@ class UserAuthController {
     const userRes = await db
       .insert(usersTable)
       .values(newUser)
-      .onConflictDoUpdate({ target: usersTable.emailHash, set: newUser })
+      .onConflictDoNothing({ target: usersTable.emailHash })
       .returning({ userId: usersTable.userId });
 
-    const userId = userRes[0].userId;
+    let user: InferSelectModel<typeof usersTable> | undefined;
+
+    // already existing
+    if (userRes.length === 0) {
+      user = await findUserByEmail(email);
+
+      if (user && user.hasEmailVerified) return "alreadyVerified";
+    }
+
+    const userId = userRes[0]?.userId || user?.userId;
+
+    if (!userId) throw new Error("No user id");
+
     const ott = genOTT();
 
     await db
@@ -121,6 +148,8 @@ class UserAuthController {
 
     // TODO: send out email with ott
     console.log("New user registered:", email, ",", ott);
+
+    return user ? "updated" : "created";
   }
 
   async verifyOTT(signInParams: { email: string; ott: string }) {
@@ -147,7 +176,13 @@ class UserAuthController {
 
     if (user.emailHash !== emailHash) throw new Error("Email is incorrect");
 
-    if (!user.hasEmailVerified) await db.update(usersTable).set({ hasEmailVerified: true });
+    if (!user.hasEmailVerified)
+      await db
+        .update(usersTable)
+        .set({ hasEmailVerified: true })
+        .where(eq(usersTable.userId, user.userId));
+
+    await db.delete(ottsTable).where(eq(ottsTable.userId, user.userId));
 
     return user.userId;
   }
@@ -201,6 +236,11 @@ class UserAuthController {
   }
 
   async finishSignUp(userId: string, finishSignUpParams: FinishSignUpParams) {
+    const user = await findUserByUserId(userId);
+
+    if (user === undefined) throw new UserNotFoundError();
+    if (!user.hasEmailVerified) throw new UserEmailNotVerifiedError();
+
     await db.insert(srpsTable).values({
       userId,
       ...finishSignUpParams.srpParams,
@@ -221,7 +261,7 @@ export const userAuthService = new Elysia({ name: "user-auth/service" })
 
       onBeforeHandle(async ({ error, jwt, cookie: { auth } }) => {
         const value = await jwt.verify(auth.value);
-        if (!value) return error(401, { success: false, message: "Unauthorized" });
+        if (!value) return error(401, "Unauthorized");
       });
     },
 
@@ -230,9 +270,8 @@ export const userAuthService = new Elysia({ name: "user-auth/service" })
 
       onBeforeHandle(async ({ error, jwt, cookie: { tmpOTTAuth } }) => {
         const value = await jwt.verify(tmpOTTAuth.value);
-        console.log(value);
 
-        if (!value) return error(401, { success: false, message: "Unauthorized" });
+        if (!value) return error(401, "Unauthorized");
       });
     },
   }));
@@ -266,9 +305,11 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
   .put(
     "/sign-up",
     async ({ body: { email }, userAuthController }): Promise<AResponse> => {
-      await userAuthController.signUp({ email });
+      const res = await userAuthController.signUp({ email });
 
-      return { message: "signed up" };
+      if (res === "alreadyVerified") return { message: res };
+
+      return { message: "signedUp" };
     },
     {
       body: "signUpUserParams",
@@ -284,12 +325,8 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
       try {
         userId = await userAuthController.verifyOTT({ email, ott });
-      } catch (e) {
-        return error(401, {
-          success: false,
-          message: "User does not exist",
-          error: e,
-        });
+      } catch {
+        return error(401, "Unauthorized");
       }
 
       const value = await jwt.sign({ userId, ott });
@@ -302,7 +339,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
         secure: false, // TODO: enable
       });
 
-      return { message: "email verified" };
+      return { message: "verified" };
     },
     { body: "verifyOTTParams" },
   )
@@ -410,9 +447,20 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
   .use(withOTTtmpUserId)
   .put(
     "/finish-sign-up",
-    async ({ body, userId, userAuthController, cookie: { tmpOTTAuth } }) => {
-      await userAuthController.finishSignUp(userId, body);
-      tmpOTTAuth.remove();
+    async ({ body, userId, userAuthController, cookie: { tmpOTTAuth }, error }) => {
+      try {
+        await userAuthController.finishSignUp(userId, body);
+      } catch (e) {
+        if (e instanceof UserNotFoundError) {
+          return error(401, "Unauthorized");
+        } else if (e instanceof UserEmailNotVerifiedError) {
+          return error(401, "Not Verified");
+        }
+
+        throw e;
+      } finally {
+        tmpOTTAuth.remove();
+      }
 
       return { status: 200, message: "success" };
     },
