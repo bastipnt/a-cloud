@@ -1,4 +1,4 @@
-import { encryptBoxBase64, genOTT, getHashBase64 } from "@acloud/crypto";
+import { encryptBoxBase64, genOTT, genSrpAttributes, getHashBase64 } from "@acloud/crypto";
 import { eq, InferSelectModel } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { serverKeys } from "../config";
@@ -194,7 +194,7 @@ class UserAuthController {
   async genSrpServerEphemeral(email: string) {
     const emailHash = await getHashBase64(email, serverKeys.hashingKey);
 
-    const user = (await db.query.usersTable.findFirst({
+    let user = (await db.query.usersTable.findFirst({
       columns: {
         userId: true,
       },
@@ -204,9 +204,11 @@ class UserAuthController {
       },
     })) as { userId: string; srp: { srpSalt: string; srpVerifier: string } }; // TODO: fix
 
-    // TODO: if no user cannot be found in the database, a bogus salt and ephemeral value should be returned, to avoid leaking which users have signed up.
-    if (!user) throw new Error("User not found");
-    if (!user.srp) throw new Error(`Srp not found for user: ${user.userId}`);
+    // if no user cannot be found in the database, a bogus salt and ephemeral value should be returned, to avoid leaking which users have signed up.
+    if (!user) {
+      const fakePassword = (Math.random() + 1).toString(36).substring(2);
+      user = { userId: crypto.randomUUID(), srp: await genSrpAttributes(fakePassword) };
+    }
 
     const { srpSalt, srpVerifier } = user.srp;
     const { userId } = user;
@@ -378,7 +380,6 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       });
 
       return {
-        message: "srp",
         srpSalt,
         srpServerEphemeralPublic,
       };
@@ -438,7 +439,6 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       });
 
       return {
-        message: "success",
         srpServerSessionProof,
       };
     },
