@@ -11,10 +11,11 @@ import { jwt } from "@elysiajs/jwt";
 import { afterAll, beforeAll, describe, expect, it, setSystemTime } from "bun:test";
 import { eq, InferSelectModel } from "drizzle-orm";
 import { jwtSecret, serverKeys } from "../config";
-import { validSignUpParams, validSignUpPassword } from "../test/test-data";
+import { validJWT, validSignUpParams, validSignUpPassword } from "../test/test-data";
 import { db, findOttByUserId, findUserByEmail, migrateDB, resetDB } from "./db";
 import { ottsTable } from "./db/schema/otts";
 import { usersTable } from "./db/schema/users";
+import { srpServer } from "./srpServer";
 import { userAuthRoutes } from "./userAuth";
 
 const api = treaty(userAuthRoutes);
@@ -179,11 +180,13 @@ describe("user auth routes", () => {
 
             expect(status).toBe(200);
             expect(data?.message).toBe("verified");
-            expect((headers as Headers).get("set-cookie")).toContain("tmpOTTAuth=");
+            expect((headers as Headers).get("set-cookie")).toContain("tmpSignUpAuth=");
 
             const cookie = (headers as Headers).get("set-cookie")!;
 
-            const jwtToken = cookie.match(/^tmpOTTAuth=(.*); Max-Age=1800; Path=\/; HttpOnly$/)![1];
+            const jwtToken = cookie.match(
+              /^tmpSignUpAuth=(.*); Max-Age=1800; Path=\/; HttpOnly$/,
+            )![1];
 
             const jwtValues = (await jwt({ secret: jwtSecret }).decorator.jwt.verify(jwtToken)) as {
               userId: string;
@@ -266,7 +269,7 @@ describe("user auth routes", () => {
 
           // removes cookie
           expect((res.headers as Headers).get("set-cookie")).toEqual(
-            "tmpOTTAuth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+            "tmpSignUpAuth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
           );
         });
       });
@@ -295,7 +298,7 @@ describe("user auth routes", () => {
 
           // removes cookie
           expect((res.headers as Headers).get("set-cookie")).toEqual(
-            "tmpOTTAuth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+            "tmpSignUpAuth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
           );
         });
       });
@@ -364,7 +367,6 @@ describe("user auth routes", () => {
     const email = "sign-in-user@example.com";
     let user: InferSelectModel<typeof usersTable>;
     let srpClientEphemeral: { srpClientEphemeralPublic: string; srpClientEphemeralSecret: string };
-    // let srpServerEphemeral: { public: string; secret: string };
 
     beforeAll(async () => {
       await api["user-auth"]["sign-up"].put({ email });
@@ -377,9 +379,6 @@ describe("user auth routes", () => {
       });
 
       srpClientEphemeral = genSrpClientEphemeral();
-      // srpServerEphemeral = await srpServer.generateEphemeral(
-      //   validSignUpParams.srpParams.srpVerifier,
-      // );
     });
 
     describe("[POST] /sign-in", () => {
@@ -394,7 +393,9 @@ describe("user auth routes", () => {
 
           const cookie = (res.headers as Headers).get("set-cookie")!;
 
-          const jwtToken = cookie.match(/^tmpAuth=(.*); Max-Age=1800; Path=\/; HttpOnly$/)![1];
+          const jwtToken = cookie.match(
+            /^tmpSignInAuth=(.*); Max-Age=1800; Path=\/; HttpOnly$/,
+          )![1];
 
           const jwtValues = (await jwt({ secret: jwtSecret }).decorator.jwt.verify(jwtToken)) as {
             userId: string;
@@ -406,10 +407,48 @@ describe("user auth routes", () => {
             userId: user.userId,
             srpClientEphemeralPublic,
           });
+
+          const userSrp = userAuthRoutes.store.srp.find(({ userId }) => userId === user.userId);
+
+          expect(userSrp).toMatchObject({
+            userId: user.userId,
+            srpSalt: validSignUpParams.srpParams.srpSalt,
+            srpVerifier: validSignUpParams.srpParams.srpVerifier,
+          });
+
+          expect(userSrp?.srpServerEphemeralSecret).toBeString();
         });
 
-        // TODO:
-        it("returns already signed in if user is already signed in", async () => {});
+        describe("with auth cookie", () => {
+          it("returns already signed in if user is already signed in", async () => {
+            const { srpClientEphemeralPublic } = srpClientEphemeral;
+            const res = await api["user-auth"]["sign-in"].post(
+              { email, srpClientEphemeralPublic },
+              { headers: { Cookie: validJWT } },
+            );
+
+            expect(res.status).toBe(200);
+            expect(res.data?.message).toBe("already signed in");
+          });
+
+          it("removes the auth cookie if it is invalid", async () => {
+            const { srpClientEphemeralPublic } = srpClientEphemeral;
+            const res = await api["user-auth"]["sign-in"].post(
+              { email, srpClientEphemeralPublic },
+              { headers: { Cookie: "auth=invalid" } },
+            );
+
+            expect(res.status).toBe(200);
+            expect(res.data?.message).toBeUndefined();
+            expect(res.data?.srpSalt).toBe(validSignUpParams.srpParams.srpSalt);
+            expect(res.data?.srpServerEphemeralPublic).toBeString();
+
+            // Removes invalid auth cookie
+            expect((res.headers as Headers).getAll("set-cookie")).toContain(
+              "auth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+            );
+          });
+        });
       });
 
       describe("wrong email", () => {
@@ -427,7 +466,7 @@ describe("user auth routes", () => {
           expect(res.data?.srpServerEphemeralPublic).toBeString();
 
           const cookie = (res.headers as Headers).get("set-cookie")!;
-          expect(cookie).toStartWith("tmpAuth=");
+          expect(cookie).toStartWith("tmpSignInAuth=");
         });
 
         it("returns validation error for invalid email", async () => {
@@ -444,7 +483,7 @@ describe("user auth routes", () => {
     });
 
     describe("[POST] /sign-in/verify-srp", () => {
-      let tmpAuthCookie: string;
+      let tmpSignInAuthCookie: string;
       let srpClientSession: {
         srpClientSessionProof: string;
         srpClientSessionKey: string;
@@ -454,8 +493,8 @@ describe("user auth routes", () => {
       beforeAll(async () => {
         const { srpClientEphemeralPublic, srpClientEphemeralSecret } = srpClientEphemeral;
         const res = await api["user-auth"]["sign-in"].post({ email, srpClientEphemeralPublic });
-        tmpAuthCookie = (res.headers as Headers).get("set-cookie")!;
-        srpServerEphemeralPublic = res.data!.srpServerEphemeralPublic;
+        tmpSignInAuthCookie = (res.headers as Headers).get("set-cookie")!;
+        srpServerEphemeralPublic = res.data!.srpServerEphemeralPublic!;
 
         srpClientSession = await deriveSrpClientSession(
           validSignUpPassword,
@@ -469,7 +508,7 @@ describe("user auth routes", () => {
         it("returns a valid session token", async () => {
           const res = await api["user-auth"]["sign-in"]["verify-srp"].post(
             { srpClientSessionProof: srpClientSession.srpClientSessionProof },
-            { headers: { Cookie: tmpAuthCookie } },
+            { headers: { Cookie: tmpSignInAuthCookie } },
           );
 
           expect(res.status).toBe(200);
@@ -477,7 +516,7 @@ describe("user auth routes", () => {
           const cookies = (res.headers as Headers).getAll("set-cookie");
           // removes tmp cookie
           expect(cookies).toContain(
-            "tmpAuth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+            "tmpSignInAuth=; Max-Age=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
           );
 
           const sessionCookie = cookies[1]!;
@@ -501,17 +540,61 @@ describe("user auth routes", () => {
               srpClientEphemeral.srpClientEphemeralPublic,
               srpClientSession.srpClientSessionProof,
               srpClientSession.srpClientSessionKey,
-              srpServerSessionProof,
+              srpServerSessionProof!,
             ),
           ).not.toThrowError();
         });
       });
 
-      // TODO:
-      describe("signed up user with invalid password", () => {});
+      describe("signed up user with invalid password", () => {
+        let invalidSrpClientSession: {
+          srpClientSessionProof: string;
+          srpClientSessionKey: string;
+        };
 
-      // TODO:
-      describe("already signed in user", () => {});
+        beforeAll(async () => {
+          const { srpClientEphemeralSecret } = srpClientEphemeral;
+
+          invalidSrpClientSession = await deriveSrpClientSession(
+            validSignUpPassword,
+            validSignUpParams.srpParams.srpSalt,
+            srpClientEphemeralSecret,
+            srpServerEphemeralPublic,
+          );
+        });
+
+        it("returns 401", async () => {
+          const srpServerEphemeral = await srpServer.generateEphemeral(
+            validSignUpParams.srpParams.srpVerifier,
+          );
+
+          userAuthRoutes.store.srp.push({
+            userId: user.userId,
+            srpServerEphemeralSecret: srpServerEphemeral.secret,
+            srpSalt: validSignUpParams.srpParams.srpSalt,
+            srpVerifier: validSignUpParams.srpParams.srpVerifier,
+          });
+
+          const res = await api["user-auth"]["sign-in"]["verify-srp"].post(
+            { srpClientSessionProof: invalidSrpClientSession.srpClientSessionProof },
+            { headers: { Cookie: tmpSignInAuthCookie } },
+          );
+
+          expect(res.status).toBe(401);
+        });
+      });
+
+      describe("already signed in user", () => {
+        it("returns already signed in", async () => {
+          const res = await api["user-auth"]["sign-in"]["verify-srp"].post(
+            { srpClientSessionProof: srpClientSession.srpClientSessionProof },
+            { headers: { Cookie: validJWT } },
+          );
+
+          expect(res.status).toBe(200);
+          expect(res.data?.message).toBe("already signed in");
+        });
+      });
     });
   });
 });

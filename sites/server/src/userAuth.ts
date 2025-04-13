@@ -93,6 +93,12 @@ const finishSignUpParams = t.Object({
   }),
 });
 
+const cookies = t.Cookie({
+  auth: t.Optional(t.String()),
+  tmpSignInAuth: t.Optional(t.String()),
+  tmpSignUpAuth: t.Optional(t.String()),
+});
+
 class UserNotFoundError extends Error {
   override name = "UserNotFoundError";
 }
@@ -257,23 +263,31 @@ class UserAuthController {
 
 export const userAuthService = new Elysia({ name: "user-auth/service" })
   .use(authPlugin)
+  .model({
+    signUpUserParams,
+    finishSignUpParams,
+    signInParams,
+    verifyOTTParams,
+    signInVerifySrpParams,
+    cookies,
+  })
   .macro(({ onBeforeHandle }) => ({
     isSignedIn(enabled: boolean) {
       if (!enabled) return;
 
       onBeforeHandle(async ({ error, jwt, cookie: { auth } }) => {
-        const value = await jwt.verify(auth.value);
-        if (!value) return error(401, "Unauthorized");
+        const value = await jwt.verify(auth?.value);
+        if (!value) error(401, "Unauthorized");
       });
     },
 
     isOTTtmpSignedIn(enabled: boolean) {
       if (!enabled) return;
 
-      onBeforeHandle(async ({ error, jwt, cookie: { tmpOTTAuth } }) => {
-        const value = await jwt.verify(tmpOTTAuth.value);
+      onBeforeHandle(async ({ error, jwt, cookie: { tmpSignUpAuth } }) => {
+        const value = await jwt.verify(tmpSignUpAuth?.value);
 
-        if (!value) return error(401, "Unauthorized");
+        if (!value) error(401, "Unauthorized");
       });
     },
   }));
@@ -281,8 +295,8 @@ export const userAuthService = new Elysia({ name: "user-auth/service" })
 export const withOTTtmpUserId = new Elysia()
   .use(userAuthService)
   .guard({ isSignedIn: false, isOTTtmpSignedIn: true })
-  .resolve(async ({ jwt, cookie: { tmpOTTAuth } }) => {
-    const value = (await jwt.verify(tmpOTTAuth.value)) as {
+  .resolve(async ({ jwt, cookie: { tmpSignUpAuth } }) => {
+    const value = (await jwt.verify(tmpSignUpAuth?.value)) as {
       userId: string;
       ott: string;
       exp: number;
@@ -297,13 +311,6 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
   .state("srp", srpState)
   .use(userAuthService)
   .decorate("userAuthController", new UserAuthController())
-  .model({
-    signUpUserParams,
-    finishSignUpParams,
-    signInParams,
-    verifyOTTParams,
-    signInVerifySrpParams,
-  })
   .put(
     "/sign-up",
     async ({ body: { email }, userAuthController }): Promise<AResponse> => {
@@ -322,7 +329,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
    */
   .post(
     "/verify-ott",
-    async ({ userAuthController, body: { email, ott }, error, cookie: { tmpOTTAuth }, jwt }) => {
+    async ({ userAuthController, body: { email, ott }, error, cookie: { tmpSignUpAuth }, jwt }) => {
       let userId: string;
 
       try {
@@ -333,7 +340,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
       const value = await jwt.sign({ userId, ott });
 
-      tmpOTTAuth.set({
+      tmpSignUpAuth.set({
         value,
         httpOnly: true,
         maxAge: 1800, // 30 min
@@ -343,7 +350,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
       return { message: "verified" };
     },
-    { body: "verifyOTTParams" },
+    { body: "verifyOTTParams", cookie: "cookies" },
   )
   .post(
     "/sign-in",
@@ -352,9 +359,17 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       userAuthController,
       store,
       jwt,
-      cookie: { tmpAuth },
+      cookie: { tmpSignInAuth, auth },
     }) => {
-      // TODO: user already signed in
+      // Check user already signed in
+      if (auth?.value) {
+        const value = await jwt.verify(auth.value);
+        if (value) {
+          return { message: "already signed in" };
+        } else {
+          auth.remove();
+        }
+      }
 
       const { srpSalt, srpServerEphemeral, srpVerifier, userId } =
         await userAuthController.genSrpServerEphemeral(email);
@@ -371,7 +386,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
       const value = await jwt.sign({ userId, srpClientEphemeralPublic });
 
-      tmpAuth.set({
+      tmpSignInAuth.set({
         value,
         httpOnly: true,
         maxAge: 1800, // 30 min
@@ -386,6 +401,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
     },
     {
       body: "signInParams",
+      cookie: "cookies",
     },
   )
   .post(
@@ -396,28 +412,42 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       store,
       error,
       jwt,
-      cookie: { auth, tmpAuth },
+      cookie: { auth, tmpSignInAuth },
     }) => {
-      const tmpAuthValue = (await jwt.verify(tmpAuth.value)) as {
+      // Check user already signed in
+      if (auth?.value) {
+        const value = await jwt.verify(auth.value);
+        if (value) {
+          return { message: "already signed in" };
+        }
+      }
+
+      const tmpSignInAuthValue = (await jwt.verify(tmpSignInAuth?.value)) as {
         userId: string;
         srpClientEphemeralPublic: string;
         exp: number;
       };
 
-      const { userId, srpClientEphemeralPublic } = tmpAuthValue;
+      const { userId, srpClientEphemeralPublic } = tmpSignInAuthValue;
       const srpUserState = store.srp.find((srp) => srp.userId === userId);
 
-      if (!srpUserState) return error(400, { message: "something went wrong" }); // TODO: better error
+      if (!srpUserState) return error(401, { message: "unauthorized" });
 
       const { srpServerEphemeralSecret, srpSalt, srpVerifier } = srpUserState;
+      let srpServerSession: Awaited<ReturnType<typeof userAuthController.verifySrpSession>>;
 
-      const srpServerSession = await userAuthController.verifySrpSession(
-        srpServerEphemeralSecret,
-        srpClientEphemeralPublic,
-        srpSalt,
-        srpVerifier,
-        srpClientSessionProof,
-      );
+      try {
+        srpServerSession = await userAuthController.verifySrpSession(
+          srpServerEphemeralSecret,
+          srpClientEphemeralPublic,
+          srpSalt,
+          srpVerifier,
+          srpClientSessionProof,
+        );
+      } catch {
+        // wrong password
+        return error(401, { message: "unauthorized" });
+      }
 
       const { proof: srpServerSessionProof, key: srpServerSessionKey } = srpServerSession;
 
@@ -428,7 +458,7 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       const value = await jwt.sign({ userId, srpServerSessionKey });
 
       // Remove temporary cookie
-      tmpAuth.remove();
+      tmpSignInAuth?.remove();
 
       auth.set({
         value,
@@ -442,12 +472,12 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
         srpServerSessionProof,
       };
     },
-    { body: "signInVerifySrpParams" },
+    { body: "signInVerifySrpParams", cookie: "cookies" },
   )
   .use(withOTTtmpUserId)
   .put(
     "/finish-sign-up",
-    async ({ body, userId, userAuthController, cookie: { tmpOTTAuth }, error }) => {
+    async ({ body, userId, userAuthController, cookie: { tmpSignUpAuth }, error }) => {
       try {
         await userAuthController.finishSignUp(userId, body);
       } catch (e) {
@@ -459,10 +489,10 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
 
         throw e;
       } finally {
-        tmpOTTAuth.remove();
+        tmpSignUpAuth.remove();
       }
 
       return { status: 200, message: "success" };
     },
-    { body: "finishSignUpParams" },
+    { body: "finishSignUpParams", cookie: "cookies" },
   );
