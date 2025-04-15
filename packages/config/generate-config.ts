@@ -1,10 +1,29 @@
 import { generateServerKeys } from "@acloud/crypto";
-import { configPath } from "./configFile";
+import { configPath, isTestENV } from "./config-helper";
 
 const generateConfig = async () => {
   console.log("Generating config...");
 
   const serverKeys = await generateServerKeys();
+
+  const getDbConfig = (dbConfigName: string, dbName: string) =>
+    `
+${dbConfigName}:
+  host: localhost
+  port: 5432
+  name: ${dbName}
+  user: acloud
+  password: acloud123
+  `.trim();
+
+  const dbConfigs: string[] = [];
+
+  if (isTestENV) {
+    dbConfigs.push(getDbConfig("dbTest", "acloud_test"));
+    dbConfigs.push(getDbConfig("dbTestWeb", "acloud_test_web"));
+  } else {
+    dbConfigs.push(getDbConfig("db", "acloud"));
+  }
 
   const config = `
 serverKeys:
@@ -14,12 +33,7 @@ serverKeys:
 jwt:
   secret: ${serverKeys.jwtSecret}
 
-db:
-  host: localhost
-  port: 5432
-  name: acloud
-  user: acloud
-  password: acloud123
+${dbConfigs.join("\n\n")}
 
 endpoint:
   api: "http://localhost:3000"

@@ -1,7 +1,7 @@
+import { migrateDB } from "@acloud/db";
 import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 import { routes } from "./routes";
-import { migrateDB } from "./src/db";
 
 migrateDB();
 

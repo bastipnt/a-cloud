@@ -1,7 +1,6 @@
 import { api } from "@acloud/client/api";
 import { config } from "@acloud/config";
-import { resetDB } from "@acloud/server/src/db";
-import { createSignedUpTestUser } from "@acloud/server/src/db/seed";
+import { createSignedUpTestUser, resetDB } from "@acloud/db";
 import { testUsers } from "@acloud/testing";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, mock } from "bun:test";
@@ -9,28 +8,28 @@ import { useLocation } from "wouter";
 import SignIn from "./SignIn";
 import "@acloud/testing/types.d.ts"; // TODO: why is it not working in tsconfig???
 
-const renee = testUsers.renee;
-
-mock.module("wouter", () => {
-  const navigate = mock((_location: string) => {});
-
-  return {
-    useLocation: () => [undefined, navigate],
-  };
-});
-
-beforeAll(async () => {
-  await createSignedUpTestUser("renee");
-});
-
-afterAll(async () => {
-  await resetDB();
-});
-
 describe("SignUp", () => {
   let emailField: HTMLInputElement;
   let passwordField: HTMLInputElement;
   let submitButton: HTMLButtonElement;
+
+  const renee = testUsers.renee;
+
+  beforeAll(async () => {
+    mock.module("wouter", () => {
+      const navigate = mock((_location: string) => {});
+
+      return {
+        useLocation: () => [undefined, navigate],
+      };
+    });
+
+    await createSignedUpTestUser("renee");
+  });
+
+  afterAll(async () => {
+    await resetDB();
+  });
 
   beforeEach(() => {
     render(<SignIn />);

@@ -1,5 +1,5 @@
 import { load } from "js-yaml";
-import { configPath } from "./configFile";
+import { configPath } from "./config-helper";
 
 interface ServerKeys {
   encryptionKey: string;
@@ -41,10 +41,12 @@ interface Internal {
 interface ServerConfig {
   serverKeys: ServerKeys;
   jwt: JWT;
-  db: DB;
   s3?: S3;
   endpoint: Endpoint;
   internal: Internal;
+  db?: DB;
+  dbTest?: DB;
+  dbTestWeb?: DB;
 }
 
 let rawConfig;
@@ -58,18 +60,3 @@ try {
 }
 
 export const config = load(rawConfig) as ServerConfig;
-
-// export const serverKeys = {
-//   encryptionKey: config.serverKeys.encryptionKey as Base64URLString,
-//   hashingKey: config.serverKeys.hashingKey as Base64URLString,
-// };
-
-// export const jwtSecret = config.jwt.secret as Base64URLString;
-
-// export const dbConf = {
-//   host: config.db.host,
-//   port: config.db.port,
-//   name: config.db.name,
-//   user: config.db.user,
-//   password: config.db.password,
-// };

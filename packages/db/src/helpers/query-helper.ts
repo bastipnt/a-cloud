@@ -1,6 +1,6 @@
 import { config } from "@acloud/config";
 import { getHashBase64 } from "@acloud/crypto";
-import { db } from "..";
+import { db } from "../..";
 
 export const findUserByEmail = async (email: string) => {
   const emailHash = await getHashBase64(email, config.serverKeys.hashingKey);

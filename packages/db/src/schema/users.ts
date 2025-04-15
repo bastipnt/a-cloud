@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import { boolean, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow } from "../helpers/default-value-helpers";
 import { filesTable } from "./files";
@@ -43,3 +43,5 @@ export const usersOTTsRelations = relations(usersTable, ({ one }) => ({
 export const usersSRPsRelations = relations(usersTable, ({ one }) => ({
   srp: one(srpsTable),
 }));
+
+export type UserType = InferSelectModel<typeof usersTable>;

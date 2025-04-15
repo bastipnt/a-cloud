@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "bun test",
-    "test:watch": "bun test --watch",
+    "test": "WEB_TEST=true bun test",
+    "test:watch": "WEB_TEST=true bun test --watch",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@acloud/server": "workspace:*",
     "@acloud/testing": "workspace:*",
+    "@acloud/db": "workspace:*",
     "@happy-dom/global-registrator": "^17.4.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",

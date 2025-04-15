@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow, getFutureDate } from "../helpers/default-value-helpers";
 import { usersTable } from "./users";
@@ -26,3 +26,5 @@ export const ottsUsersRelaltions = relations(ottsTable, ({ one }) => ({
     references: [usersTable.userId],
   }),
 }));
+
+export type OTTType = InferSelectModel<typeof ottsTable>;

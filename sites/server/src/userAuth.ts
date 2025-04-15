@@ -1,12 +1,17 @@
 import { config } from "@acloud/config";
 import { encryptBoxBase64, genOTT, genSrpAttributes, getHashBase64 } from "@acloud/crypto";
-import { eq, InferSelectModel } from "drizzle-orm";
+import {
+  db,
+  eq,
+  findUserByEmail,
+  findUserByUserId,
+  keysTable,
+  ottsTable,
+  srpsTable,
+  usersTable,
+  UserType,
+} from "@acloud/db";
 import Elysia, { t } from "elysia";
-import { db, findUserByEmail, findUserByUserId } from "./db";
-import { keysTable } from "./db/schema/keys";
-import { ottsTable } from "./db/schema/otts";
-import { srpsTable } from "./db/schema/srps";
-import { usersTable } from "./db/schema/users";
 import { authPlugin } from "./plugins/authPlugin";
 import { srpServer } from "./srpServer";
 
@@ -132,7 +137,7 @@ class UserAuthController {
       .onConflictDoNothing({ target: usersTable.emailHash })
       .returning({ userId: usersTable.userId });
 
-    let user: InferSelectModel<typeof usersTable> | undefined;
+    let user: UserType | undefined;
 
     // already existing
     if (userRes.length === 0) {

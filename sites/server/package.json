@@ -11,24 +11,22 @@
     "migrate": "bun run ./src/db/migrate.ts"
   },
   "dependencies": {
-    "@acloud/crypto": "workspace:*",
     "@acloud/config": "workspace:*",
+    "@acloud/crypto": "workspace:*",
+    "@acloud/db": "workspace:*",
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/jwt": "^1.2.0",
     "@swan-io/srp": "^0.2.6",
-    "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.41.0",
-    "drizzle-seed": "^0.3.1",
-    "elysia": "latest",
-    "pg": "^8.14.1"
+    "elysia": "latest"
   },
   "devDependencies": {
     "@acloud/testing": "workspace:*",
     "@elysiajs/eden": "^1.2.0",
     "@types/bun": "^1.2.8",
-    "@types/pg": "^8.11.11",
-    "bun-types": "latest",
-    "drizzle-kit": "^0.30.6"
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   },
   "module": "index.js"
 }

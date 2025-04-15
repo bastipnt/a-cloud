@@ -5,10 +5,17 @@ serverKeys:
 jwt:
   secret: oncxi1uiFfy+kHTh59N5jZpPKVGL+z71xq2z+/oSlYE=
 
-db:
+dbTest:
   host: localhost
   port: 5432
   name: acloud_test
+  user: acloud
+  password: acloud123
+
+dbTestWeb:
+  host: localhost
+  port: 5432
+  name: acloud_test_web
   user: acloud
   password: acloud123
 

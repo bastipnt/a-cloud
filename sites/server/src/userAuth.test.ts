@@ -6,14 +6,22 @@ import {
   verifySrpSession,
 } from "@acloud/crypto";
 import { fromBase64 } from "@acloud/crypto/src/util/conversion-helper";
+import {
+  db,
+  eq,
+  findOttByUserId,
+  findUserByEmail,
+  migrateDB,
+  ottsTable,
+  OTTType,
+  resetDB,
+  usersTable,
+  UserType,
+} from "@acloud/db";
 import { testUsers } from "@acloud/testing";
 import { Treaty, treaty } from "@elysiajs/eden";
 import { jwt } from "@elysiajs/jwt";
 import { afterAll, beforeAll, describe, expect, it, setSystemTime } from "bun:test";
-import { eq, InferSelectModel } from "drizzle-orm";
-import { db, findOttByUserId, findUserByEmail, migrateDB, resetDB } from "./db";
-import { ottsTable } from "./db/schema/otts";
-import { usersTable } from "./db/schema/users";
 import { srpServer } from "./srpServer";
 import { userAuthRoutes } from "./userAuth";
 
@@ -37,7 +45,7 @@ describe("user auth routes", () => {
         let res: Treaty.TreatyResponse<{
           200: AResponse;
         }>;
-        let user: InferSelectModel<typeof usersTable>;
+        let user: UserType;
 
         beforeAll(async () => {
           res = await api["user-auth"]["sign-up"].put({ email });
@@ -116,7 +124,7 @@ describe("user auth routes", () => {
       });
 
       describe("already existing verified user", () => {
-        let user: InferSelectModel<typeof usersTable>;
+        let user: UserType;
         const email = "test3-user@example.com";
 
         beforeAll(async () => {
@@ -155,8 +163,8 @@ describe("user auth routes", () => {
 
     describe("[POST] /verify-ott", () => {
       describe("existing unverified user", () => {
-        let user: InferSelectModel<typeof usersTable>;
-        let ott: InferSelectModel<typeof ottsTable>;
+        let user: UserType;
+        let ott: OTTType;
         const email = "test-put-verify-ott@example.com";
         const email2 = "test-put-verify-ott-2@example.com";
         let res: Treaty.TreatyResponse<{
@@ -239,7 +247,7 @@ describe("user auth routes", () => {
       describe("with valid jwt token and params", () => {
         const lara = testUsers.lara;
         const { email } = lara;
-        let user: InferSelectModel<typeof usersTable>;
+        let user: UserType;
         let cookie: string;
 
         beforeAll(async () => {
@@ -282,7 +290,7 @@ describe("user auth routes", () => {
       describe("with not existing user", () => {
         const ben = testUsers.ben;
         const { email } = ben;
-        let user: InferSelectModel<typeof usersTable>;
+        let user: UserType;
         let cookie: string;
 
         beforeAll(async () => {
@@ -312,7 +320,7 @@ describe("user auth routes", () => {
       describe("invalid cookie", () => {
         const jo = testUsers.jo;
         const { email } = jo;
-        let user: InferSelectModel<typeof usersTable>;
+        let user: UserType;
 
         beforeAll(async () => {
           await api["user-auth"]["sign-up"].put({ email });
@@ -344,7 +352,7 @@ describe("user auth routes", () => {
       describe("unverified email", () => {
         const julia = testUsers.julia;
         const { email } = julia;
-        let user: InferSelectModel<typeof usersTable>;
+        let user: UserType;
         let cookie: string;
 
         beforeAll(async () => {
@@ -372,7 +380,7 @@ describe("user auth routes", () => {
   });
 
   describe("sign-in", () => {
-    let user: InferSelectModel<typeof usersTable>;
+    let user: UserType;
     const peter = testUsers.peter;
     const { email } = peter;
 

@@ -1,6 +1,6 @@
 import { testUsers } from "@acloud/testing";
 import { eq } from "drizzle-orm";
-import { db } from ".";
+import { db } from "..";
 import { keysTable } from "./schema/keys";
 import { srpsTable } from "./schema/srps";
 import { usersTable } from "./schema/users";
