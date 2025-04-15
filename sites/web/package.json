@@ -26,6 +26,8 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@acloud/server": "workspace:*",
+    "@acloud/testing": "workspace:*",
     "@happy-dom/global-registrator": "^17.4.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
@@ -35,6 +37,8 @@
     "@vitejs/plugin-react": "^4.3.4",
     "bun-types": "^1.2.8",
     "elysia": "^1.2.25",
+    "happy-dom": "^17.4.4",
+    "tough-cookie": "^5.1.2",
     "typescript": "~5.7.2",
     "vite": "^6.2.0",
     "vitest": "^3.1.1"

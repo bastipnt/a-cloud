@@ -13,7 +13,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["bun-types"],
+    "types": ["bun-types", "./test.global.d.ts", "@acloud/testing/types.d.ts"],
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -21,6 +21,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"],
-  "exclude": ["**/*.test.{ts,tsx}"]
+  "include": ["**/*.test.tsx"]
 }

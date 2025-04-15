@@ -193,10 +193,6 @@ class UserAuthController {
     return user.userId;
   }
 
-  async saveSrpVerifier(userId: string, srpSalt: string, srpVerifier: string) {
-    await db.insert(srpsTable).values({ userId, srpSalt, srpVerifier });
-  }
-
   async genSrpServerEphemeral(email: string) {
     const emailHash = await getHashBase64(email, serverKeys.hashingKey);
 

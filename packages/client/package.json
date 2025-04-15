@@ -4,7 +4,9 @@
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "elysia": "latest",
+    "@acloud/testing": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

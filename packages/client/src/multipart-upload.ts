@@ -1,6 +1,6 @@
 import { mergeUint8Arrays } from "@acloud/common";
 import type { EncryptedFileStream } from "@acloud/crypto";
-import { client } from "..";
+import { api } from "../api";
 
 interface PartEtag {
   PartNumber: number;
@@ -33,10 +33,10 @@ export const multipartStreamUpload = async (encryptedFile: EncryptedFileStream) 
   for (let i = 0; i < uploadPartCount; i++) {
     const uploadChunk = await combineChunksToFormUploadPart(streamReader);
 
-    // client.upload.file.post({ filePart: uploadChunk });
+    // api.upload.file.post({ filePart: uploadChunk });
   }
 
-  // client.upload.file
+  // api.upload.file
   //   .post({ file: aFiles.map((aFile) => aFile.file)[0] })
   //   .then((data) => console.log(data))
   //   .catch((err) => console.error(err));

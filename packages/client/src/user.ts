@@ -5,7 +5,7 @@ import {
   genSrpClientEphemeral,
   verifySrpSession,
 } from "@acloud/crypto";
-import { client } from "..";
+import { api } from "../api";
 
 type ProofSrpAttributes = {
   srpClientEphemeralSecret: string;
@@ -17,7 +17,7 @@ type ProofSrpAttributes = {
 export const signIn = async (email: string): Promise<ProofSrpAttributes> => {
   const { srpClientEphemeralPublic, srpClientEphemeralSecret } = genSrpClientEphemeral();
 
-  const res = await client["user-auth"]["sign-in"].post({
+  const res = await api["user-auth"]["sign-in"].post({
     email,
     srpClientEphemeralPublic,
   });
@@ -38,7 +38,7 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
     srpServerEphemeralPublic,
   );
 
-  const res = await client["user-auth"]["sign-in"]["verify-srp"].post({
+  const res = await api["user-auth"]["sign-in"]["verify-srp"].post({
     srpClientSessionProof,
   });
 
@@ -61,13 +61,13 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
  * @returns the userId of the new created user and the generated keyParams
  */
 export const signUp = async (email: string) => {
-  const res = await client["user-auth"]["sign-up"].put({ email });
+  const res = await api["user-auth"]["sign-up"].put({ email });
 
   if (res.status !== 200) throw new Error("User could not be created");
 };
 
 export const verifyOTT = async (email: string, ott: string) => {
-  const res = await client["user-auth"]["verify-ott"].post({
+  const res = await api["user-auth"]["verify-ott"].post({
     email,
     ott,
   });
@@ -81,7 +81,7 @@ export const finishSignUp = async (password: string) => {
   const srpParams = await genSrpAttributes(password);
   const keyParams = await cryptoWorker.genNewUserKeys(password);
 
-  const res = await client["user-auth"]["finish-sign-up"].put({
+  const res = await api["user-auth"]["finish-sign-up"].put({
     srpParams,
     keyParams,
   });
@@ -90,7 +90,7 @@ export const finishSignUp = async (password: string) => {
 };
 
 export const getUser = async () => {
-  const res = await client.user.index.get();
+  const res = await api.user.index.get();
 
   if (res.status !== 200 || !res.data) throw new Error("Not logged in");
 

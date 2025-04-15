@@ -1,6 +1,6 @@
 import { mergeUint8Arrays } from "@acloud/common";
 import type { EncryptedFileStream } from "@acloud/crypto";
-import { client } from "..";
+import { api } from "../api";
 
 const combineChunksToFormUploadPart = async (
   streamReader: ReadableStreamDefaultReader<Uint8Array>,
@@ -32,7 +32,7 @@ export const uploadStream = async (encryptedFile: EncryptedFileStream) => {
 
   const uploadFile = new File([new Blob([uploadChunks])], "hello");
 
-  const res = await client.upload.file.post({ file: uploadFile });
+  const res = await api.upload.file.post({ file: uploadFile });
 
   console.log(res);
 };

@@ -50,7 +50,7 @@ interface ServerConfig {
 const configFile = Bun.env.NODE_ENV === "test" ? "config.test.yaml" : "config.yaml";
 const configPath = resolve(__dirname, "../../", configFile);
 const rawConfig = await Bun.file(configPath).text();
-const config = load(rawConfig) as ServerConfig;
+export const config = load(rawConfig) as ServerConfig;
 
 export const serverKeys = {
   encryptionKey: config.serverKeys.encryptionKey as Base64URLString,

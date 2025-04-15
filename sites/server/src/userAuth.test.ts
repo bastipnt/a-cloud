@@ -1,17 +1,16 @@
 import {
   deriveSrpClientSession,
   encryptBoxWithNonceBase64,
-  genSrpClientEphemeral,
   getHashBase64,
   verifySrpSession,
 } from "@acloud/crypto";
 import { fromBase64 } from "@acloud/crypto/src/util/conversion-helper";
+import { testUsers } from "@acloud/testing";
 import { Treaty, treaty } from "@elysiajs/eden";
 import { jwt } from "@elysiajs/jwt";
 import { afterAll, beforeAll, describe, expect, it, setSystemTime } from "bun:test";
 import { eq, InferSelectModel } from "drizzle-orm";
 import { jwtSecret, serverKeys } from "../config";
-import { validJWT, validSignUpParams, validSignUpPassword } from "../test/test-data";
 import { db, findOttByUserId, findUserByEmail, migrateDB, resetDB } from "./db";
 import { ottsTable } from "./db/schema/otts";
 import { usersTable } from "./db/schema/users";
@@ -34,7 +33,7 @@ describe("user auth routes", () => {
   describe("sign-up", () => {
     describe("[PUT] /sign-up", () => {
       describe("valid new user", () => {
-        const email = "test1-user@example.com";
+        const email = "sign-up-valid@example.com";
         let res: Treaty.TreatyResponse<{
           200: AResponse;
         }>;
@@ -236,7 +235,8 @@ describe("user auth routes", () => {
 
     describe("[PUT] /finish-sign-up", () => {
       describe("with valid jwt token and params", () => {
-        const email = "finish-sign-up-valid@example.com";
+        const lara = testUsers.lara;
+        const { email } = lara;
         let user: InferSelectModel<typeof usersTable>;
         let cookie: string;
 
@@ -249,7 +249,7 @@ describe("user auth routes", () => {
         });
 
         it("stores the srp and key params and removes the tmp cookie", async () => {
-          const res = await api["user-auth"]["finish-sign-up"].put(validSignUpParams, {
+          const res = await api["user-auth"]["finish-sign-up"].put(lara.signUpParams, {
             headers: { Cookie: cookie },
           });
 
@@ -259,13 +259,16 @@ describe("user auth routes", () => {
             where: (k, { eq }) => eq(k.userId, user.userId),
           }))!;
 
-          expect(keys).toMatchObject({ ...validSignUpParams.keyParams, userId: user.userId });
+          expect(keys).toMatchObject({ ...lara.signUpParams.keyParams, userId: user.userId });
 
           const srpValues = (await db.query.srpsTable.findFirst({
             where: (s, { eq }) => eq(s.userId, user.userId),
           }))!;
 
-          expect(srpValues).toMatchObject({ ...validSignUpParams.srpParams, userId: user.userId });
+          expect(srpValues).toMatchObject({
+            ...lara.signUpParams.srpParams,
+            userId: user.userId,
+          });
 
           // removes cookie
           expect((res.headers as Headers).get("set-cookie")).toEqual(
@@ -275,7 +278,8 @@ describe("user auth routes", () => {
       });
 
       describe("with not existing user", () => {
-        const email = "finish-sign-up-valid-not-existing-user@example.com";
+        const ben = testUsers.ben;
+        const { email } = ben;
         let user: InferSelectModel<typeof usersTable>;
         let cookie: string;
 
@@ -290,7 +294,7 @@ describe("user auth routes", () => {
         });
 
         it("returns 401", async () => {
-          const res = await api["user-auth"]["finish-sign-up"].put(validSignUpParams, {
+          const res = await api["user-auth"]["finish-sign-up"].put(ben.signUpParams, {
             headers: { Cookie: cookie },
           });
 
@@ -304,7 +308,8 @@ describe("user auth routes", () => {
       });
 
       describe("invalid cookie", () => {
-        const email = "finish-sign-up-invalid-cookie@example.com";
+        const jo = testUsers.jo;
+        const { email } = jo;
         let user: InferSelectModel<typeof usersTable>;
 
         beforeAll(async () => {
@@ -316,7 +321,7 @@ describe("user auth routes", () => {
 
         describe("cookie not set", () => {
           it("returns 401", async () => {
-            const res = await api["user-auth"]["finish-sign-up"].put(validSignUpParams);
+            const res = await api["user-auth"]["finish-sign-up"].put(jo.signUpParams);
 
             expect(res.status).toBe(401);
           });
@@ -324,7 +329,7 @@ describe("user auth routes", () => {
 
         describe("cookie invalid", () => {
           it("returns 401", async () => {
-            const res = await api["user-auth"]["finish-sign-up"].put(validSignUpParams, {
+            const res = await api["user-auth"]["finish-sign-up"].put(jo.signUpParams, {
               headers: { Cookie: "invalid" },
             });
 
@@ -335,7 +340,8 @@ describe("user auth routes", () => {
       });
 
       describe("unverified email", () => {
-        const email = "finish-sign-up-unverified@example.com";
+        const julia = testUsers.julia;
+        const { email } = julia;
         let user: InferSelectModel<typeof usersTable>;
         let cookie: string;
 
@@ -352,7 +358,7 @@ describe("user auth routes", () => {
         });
 
         it("returns 401", async () => {
-          const res = await api["user-auth"]["finish-sign-up"].put(validSignUpParams, {
+          const res = await api["user-auth"]["finish-sign-up"].put(julia.signUpParams, {
             headers: { Cookie: cookie },
           });
 
@@ -364,9 +370,9 @@ describe("user auth routes", () => {
   });
 
   describe("sign-in", () => {
-    const email = "sign-in-user@example.com";
     let user: InferSelectModel<typeof usersTable>;
-    let srpClientEphemeral: { srpClientEphemeralPublic: string; srpClientEphemeralSecret: string };
+    const peter = testUsers.peter;
+    const { email } = peter;
 
     beforeAll(async () => {
       await api["user-auth"]["sign-up"].put({ email });
@@ -374,21 +380,19 @@ describe("user auth routes", () => {
       const ott = (await findOttByUserId(user.userId))!.ott;
       const res = await api["user-auth"]["verify-ott"].post({ email, ott });
       const tmpCookie = (res.headers as Headers).get("set-cookie")!;
-      await api["user-auth"]["finish-sign-up"].put(validSignUpParams, {
+      await api["user-auth"]["finish-sign-up"].put(peter.signUpParams, {
         headers: { Cookie: tmpCookie },
       });
-
-      srpClientEphemeral = genSrpClientEphemeral();
     });
 
     describe("[POST] /sign-in", () => {
       describe("signed up user with valid credentials", () => {
         it("returns srp attributes and a temporary session", async () => {
-          const { srpClientEphemeralPublic } = srpClientEphemeral;
+          const { srpClientEphemeralPublic } = peter.srpClientEphemeral;
           const res = await api["user-auth"]["sign-in"].post({ email, srpClientEphemeralPublic });
 
           expect(res.status).toBe(200);
-          expect(res.data?.srpSalt).toBe(validSignUpParams.srpParams.srpSalt);
+          expect(res.data?.srpSalt).toBe(peter.signUpParams.srpParams.srpSalt);
           expect(res.data?.srpServerEphemeralPublic).toBeString();
 
           const cookie = (res.headers as Headers).get("set-cookie")!;
@@ -412,8 +416,8 @@ describe("user auth routes", () => {
 
           expect(userSrp).toMatchObject({
             userId: user.userId,
-            srpSalt: validSignUpParams.srpParams.srpSalt,
-            srpVerifier: validSignUpParams.srpParams.srpVerifier,
+            srpSalt: peter.signUpParams.srpParams.srpSalt,
+            srpVerifier: peter.signUpParams.srpParams.srpVerifier,
           });
 
           expect(userSrp?.srpServerEphemeralSecret).toBeString();
@@ -421,10 +425,10 @@ describe("user auth routes", () => {
 
         describe("with auth cookie", () => {
           it("returns already signed in if user is already signed in", async () => {
-            const { srpClientEphemeralPublic } = srpClientEphemeral;
+            const { srpClientEphemeralPublic } = peter.srpClientEphemeral;
             const res = await api["user-auth"]["sign-in"].post(
               { email, srpClientEphemeralPublic },
-              { headers: { Cookie: validJWT } },
+              { headers: { Cookie: `auth=${peter.jwt}` } },
             );
 
             expect(res.status).toBe(200);
@@ -432,7 +436,7 @@ describe("user auth routes", () => {
           });
 
           it("removes the auth cookie if it is invalid", async () => {
-            const { srpClientEphemeralPublic } = srpClientEphemeral;
+            const { srpClientEphemeralPublic } = peter.srpClientEphemeral;
             const res = await api["user-auth"]["sign-in"].post(
               { email, srpClientEphemeralPublic },
               { headers: { Cookie: "auth=invalid" } },
@@ -440,7 +444,7 @@ describe("user auth routes", () => {
 
             expect(res.status).toBe(200);
             expect(res.data?.message).toBeUndefined();
-            expect(res.data?.srpSalt).toBe(validSignUpParams.srpParams.srpSalt);
+            expect(res.data?.srpSalt).toBe(peter.signUpParams.srpParams.srpSalt);
             expect(res.data?.srpServerEphemeralPublic).toBeString();
 
             // Removes invalid auth cookie
@@ -454,7 +458,7 @@ describe("user auth routes", () => {
       describe("wrong email", () => {
         // if no user cannot be found in the database, a bogus salt and ephemeral value should be returned, to avoid leaking which users have signed up.
         it("returns 200 with bogus salt and ephemeral", async () => {
-          const { srpClientEphemeralPublic } = srpClientEphemeral;
+          const { srpClientEphemeralPublic } = peter.srpClientEphemeral;
           const res = await api["user-auth"]["sign-in"].post({
             email: "wrong@example.com",
             srpClientEphemeralPublic,
@@ -470,7 +474,7 @@ describe("user auth routes", () => {
         });
 
         it("returns validation error for invalid email", async () => {
-          const { srpClientEphemeralPublic } = srpClientEphemeral;
+          const { srpClientEphemeralPublic } = peter.srpClientEphemeral;
           const res = await api["user-auth"]["sign-in"].post({
             email: "invalid",
             srpClientEphemeralPublic,
@@ -491,14 +495,14 @@ describe("user auth routes", () => {
       let srpServerEphemeralPublic: string;
 
       beforeAll(async () => {
-        const { srpClientEphemeralPublic, srpClientEphemeralSecret } = srpClientEphemeral;
+        const { srpClientEphemeralPublic, srpClientEphemeralSecret } = peter.srpClientEphemeral;
         const res = await api["user-auth"]["sign-in"].post({ email, srpClientEphemeralPublic });
         tmpSignInAuthCookie = (res.headers as Headers).get("set-cookie")!;
         srpServerEphemeralPublic = res.data!.srpServerEphemeralPublic!;
 
         srpClientSession = await deriveSrpClientSession(
-          validSignUpPassword,
-          validSignUpParams.srpParams.srpSalt,
+          peter.password,
+          peter.signUpParams.srpParams.srpSalt,
           srpClientEphemeralSecret,
           srpServerEphemeralPublic,
         );
@@ -508,7 +512,7 @@ describe("user auth routes", () => {
         it("returns a valid session token", async () => {
           const res = await api["user-auth"]["sign-in"]["verify-srp"].post(
             { srpClientSessionProof: srpClientSession.srpClientSessionProof },
-            { headers: { Cookie: tmpSignInAuthCookie } },
+            { headers: { cookie: tmpSignInAuthCookie } },
           );
 
           expect(res.status).toBe(200);
@@ -537,7 +541,7 @@ describe("user auth routes", () => {
 
           expect(() =>
             verifySrpSession(
-              srpClientEphemeral.srpClientEphemeralPublic,
+              peter.srpClientEphemeral.srpClientEphemeralPublic,
               srpClientSession.srpClientSessionProof,
               srpClientSession.srpClientSessionKey,
               srpServerSessionProof!,
@@ -553,11 +557,11 @@ describe("user auth routes", () => {
         };
 
         beforeAll(async () => {
-          const { srpClientEphemeralSecret } = srpClientEphemeral;
+          const { srpClientEphemeralSecret } = peter.srpClientEphemeral;
 
           invalidSrpClientSession = await deriveSrpClientSession(
-            validSignUpPassword,
-            validSignUpParams.srpParams.srpSalt,
+            peter.password,
+            peter.signUpParams.srpParams.srpSalt,
             srpClientEphemeralSecret,
             srpServerEphemeralPublic,
           );
@@ -565,14 +569,14 @@ describe("user auth routes", () => {
 
         it("returns 401", async () => {
           const srpServerEphemeral = await srpServer.generateEphemeral(
-            validSignUpParams.srpParams.srpVerifier,
+            peter.signUpParams.srpParams.srpVerifier,
           );
 
           userAuthRoutes.store.srp.push({
             userId: user.userId,
             srpServerEphemeralSecret: srpServerEphemeral.secret,
-            srpSalt: validSignUpParams.srpParams.srpSalt,
-            srpVerifier: validSignUpParams.srpParams.srpVerifier,
+            srpSalt: peter.signUpParams.srpParams.srpSalt,
+            srpVerifier: peter.signUpParams.srpParams.srpVerifier,
           });
 
           const res = await api["user-auth"]["sign-in"]["verify-srp"].post(
@@ -588,7 +592,7 @@ describe("user auth routes", () => {
         it("returns already signed in", async () => {
           const res = await api["user-auth"]["sign-in"]["verify-srp"].post(
             { srpClientSessionProof: srpClientSession.srpClientSessionProof },
-            { headers: { Cookie: validJWT } },
+            { headers: { Cookie: `auth=${peter.jwt}` } },
           );
 
           expect(res.status).toBe(200);

@@ -1,9 +1,11 @@
+import { testUsers } from "@acloud/testing";
 import { treaty } from "@elysiajs/eden";
 import { describe, expect, it } from "bun:test";
-import { validJWT, validUserId } from "../test/test-data";
 import { userRoutes } from "./user";
 
 const api = treaty(userRoutes);
+
+const ty = testUsers.ty;
 
 describe("user routes", () => {
   describe("[GET] /", () => {
@@ -11,13 +13,13 @@ describe("user routes", () => {
       it("returns an existing userId", async () => {
         const { data } = await api.user.index.get({
           headers: {
-            Cookie: validJWT,
+            Cookie: ty.jwt,
           },
         });
 
         expect(data).toEqual({
           message: "Get user",
-          userId: validUserId,
+          userId: ty.userId,
         });
       });
     });

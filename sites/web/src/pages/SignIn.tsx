@@ -22,7 +22,7 @@ const SignIn: React.FC = () => {
 
   useEffect(() => {
     const email = getEmail();
-    if (!email) return console.log("Error: Email could not be retrieved");
+    if (!email) return;
 
     setExistingEmail(email);
   }, []);

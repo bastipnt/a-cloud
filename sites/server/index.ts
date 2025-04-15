@@ -1,10 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
+import { routes } from "./routes";
 import { migrateDB } from "./src/db";
-import { downloadRoutes } from "./src/download";
-import { uploadRoutes } from "./src/upload";
-import { userRoutes } from "./src/user";
-import { userAuthRoutes } from "./src/userAuth";
 
 migrateDB();
 
@@ -16,10 +13,7 @@ export const app = new Elysia()
       origin: "localhost:5173",
     }),
   )
-  .use(userAuthRoutes)
-  .use(userRoutes)
-  .use(uploadRoutes)
-  .use(downloadRoutes);
+  .use(routes);
 
 app.listen(3000);
 
