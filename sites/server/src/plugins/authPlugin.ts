@@ -1,12 +1,12 @@
+import { config } from "@acloud/config";
 import jwt from "@elysiajs/jwt";
 import Elysia from "elysia";
-import { jwtSecret } from "../../config";
 
 export const authPlugin = new Elysia()
   .use(
     jwt({
       name: "jwt",
-      secret: jwtSecret,
+      secret: config.jwt.secret,
       exp: "7d",
     }),
   )

@@ -13,7 +13,7 @@ describe("user routes", () => {
       it("returns an existing userId", async () => {
         const { data } = await api.user.index.get({
           headers: {
-            Cookie: ty.jwt,
+            Cookie: `auth=${ty.jwt}`,
           },
         });
 

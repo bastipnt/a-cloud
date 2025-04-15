@@ -1,3 +1,4 @@
+import { config } from "@acloud/config";
 import {
   deriveSrpClientSession,
   encryptBoxBase64,
@@ -6,7 +7,6 @@ import {
   genSrpClientEphemeral,
   getHashBase64,
 } from "@acloud/crypto";
-import { serverKeys } from "@acloud/server/config";
 import { srpServer } from "@acloud/server/src/srpServer";
 import { genJWT } from "@acloud/server/util";
 
@@ -21,10 +21,10 @@ export const genPassword = () => {
 export const getEmailParams = async (email: string) => {
   const [encryptedEmail, emailNonce] = await encryptBoxBase64(
     btoa(email),
-    serverKeys.encryptionKey,
+    config.serverKeys.encryptionKey,
   );
 
-  const emailHash = await getHashBase64(email, serverKeys.hashingKey);
+  const emailHash = await getHashBase64(email, config.serverKeys.hashingKey);
 
   return {
     encryptedEmail,

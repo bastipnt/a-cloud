@@ -18,6 +18,7 @@
     "@acloud/common": "workspace:*",
     "@acloud/crypto": "workspace:*",
     "@acloud/media": "workspace:*",
+    "@acloud/config": "workspace:*",
     "formik": "^2.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -1,5 +1,5 @@
-import { resolve } from "path";
 import { load } from "js-yaml";
+import { configPath } from "./configFile";
 
 interface ServerKeys {
   encryptionKey: string;
@@ -47,22 +47,29 @@ interface ServerConfig {
   internal: Internal;
 }
 
-const configFile = Bun.env.NODE_ENV === "test" ? "config.test.yaml" : "config.yaml";
-const configPath = resolve(__dirname, "../../", configFile);
-const rawConfig = await Bun.file(configPath).text();
+let rawConfig;
+
+try {
+  rawConfig = await Bun.file(configPath).text();
+} catch (error) {
+  console.error(`failed to load config from ${configPath}`);
+  console.error("please generate it with: bun run gen:config or bun run gen:test-config");
+  throw error;
+}
+
 export const config = load(rawConfig) as ServerConfig;
 
-export const serverKeys = {
-  encryptionKey: config.serverKeys.encryptionKey as Base64URLString,
-  hashingKey: config.serverKeys.hashingKey as Base64URLString,
-};
+// export const serverKeys = {
+//   encryptionKey: config.serverKeys.encryptionKey as Base64URLString,
+//   hashingKey: config.serverKeys.hashingKey as Base64URLString,
+// };
 
-export const jwtSecret = config.jwt.secret as Base64URLString;
+// export const jwtSecret = config.jwt.secret as Base64URLString;
 
-export const dbConf = {
-  host: config.db.host,
-  port: config.db.port,
-  name: config.db.name,
-  user: config.db.user,
-  password: config.db.password,
-};
+// export const dbConf = {
+//   host: config.db.host,
+//   port: config.db.port,
+//   name: config.db.name,
+//   user: config.db.user,
+//   password: config.db.password,
+// };

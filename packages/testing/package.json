@@ -3,13 +3,14 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "test:genTestData": "NODE_ENV=test && bun run ./generate-test-users.ts"
+    "gen:test-users": "NODE_ENV=test bun run ./generate-test-users.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "tough-cookie": "^5.1.2",
     "@acloud/crypto": "workspace:*",
-    "@acloud/server": "workspace:*"
+    "@acloud/server": "workspace:*",
+    "@acloud/config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

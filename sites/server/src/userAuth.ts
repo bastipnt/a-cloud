@@ -1,7 +1,7 @@
+import { config } from "@acloud/config";
 import { encryptBoxBase64, genOTT, genSrpAttributes, getHashBase64 } from "@acloud/crypto";
 import { eq, InferSelectModel } from "drizzle-orm";
 import Elysia, { t } from "elysia";
-import { serverKeys } from "../config";
 import { db, findUserByEmail, findUserByUserId } from "./db";
 import { keysTable } from "./db/schema/keys";
 import { ottsTable } from "./db/schema/otts";
@@ -115,10 +115,10 @@ class UserAuthController {
 
     const [encryptedEmail, emailNonce] = await encryptBoxBase64(
       btoa(email),
-      serverKeys.encryptionKey,
+      config.serverKeys.encryptionKey,
     );
 
-    const emailHash = await getHashBase64(email, serverKeys.hashingKey);
+    const emailHash = await getHashBase64(email, config.serverKeys.hashingKey);
 
     const newUser = {
       encryptedEmail,
@@ -159,7 +159,7 @@ class UserAuthController {
   }
 
   async verifyOTT(signInParams: { email: string; ott: string }) {
-    const emailHash = await getHashBase64(signInParams.email, serverKeys.hashingKey);
+    const emailHash = await getHashBase64(signInParams.email, config.serverKeys.hashingKey);
 
     const res = await db.query.ottsTable.findFirst({
       columns: {},
@@ -194,7 +194,7 @@ class UserAuthController {
   }
 
   async genSrpServerEphemeral(email: string) {
-    const emailHash = await getHashBase64(email, serverKeys.hashingKey);
+    const emailHash = await getHashBase64(email, config.serverKeys.hashingKey);
 
     let user = (await db.query.usersTable.findFirst({
       columns: {

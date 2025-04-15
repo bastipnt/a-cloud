@@ -1,4 +1,4 @@
-import { config } from "@acloud/server/config";
+import { config } from "@acloud/config";
 import { routes } from "@acloud/server/routes";
 import { parseCookie, splitCookies } from "@acloud/testing";
 import { treaty } from "@elysiajs/eden";

@@ -1,3 +1,4 @@
+import { config } from "@acloud/config";
 import {
   deriveSrpClientSession,
   encryptBoxWithNonceBase64,
@@ -10,7 +11,6 @@ import { Treaty, treaty } from "@elysiajs/eden";
 import { jwt } from "@elysiajs/jwt";
 import { afterAll, beforeAll, describe, expect, it, setSystemTime } from "bun:test";
 import { eq, InferSelectModel } from "drizzle-orm";
-import { jwtSecret, serverKeys } from "../config";
 import { db, findOttByUserId, findUserByEmail, migrateDB, resetDB } from "./db";
 import { ottsTable } from "./db/schema/otts";
 import { usersTable } from "./db/schema/users";
@@ -52,10 +52,10 @@ describe("user auth routes", () => {
         });
 
         it("stores the new created user in the db", async () => {
-          const emailHash = await getHashBase64(email, serverKeys.hashingKey);
+          const emailHash = await getHashBase64(email, config.serverKeys.hashingKey);
           const encryptedEmail = await encryptBoxWithNonceBase64(
             btoa(email),
-            serverKeys.encryptionKey,
+            config.serverKeys.encryptionKey,
             await fromBase64(user.emailNonce),
           );
 
@@ -187,7 +187,9 @@ describe("user auth routes", () => {
               /^tmpSignUpAuth=(.*); Max-Age=1800; Path=\/; HttpOnly$/,
             )![1];
 
-            const jwtValues = (await jwt({ secret: jwtSecret }).decorator.jwt.verify(jwtToken)) as {
+            const jwtValues = (await jwt({ secret: config.jwt.secret }).decorator.jwt.verify(
+              jwtToken,
+            )) as {
               userId: string;
               ott: string;
               exp: number;
@@ -401,7 +403,9 @@ describe("user auth routes", () => {
             /^tmpSignInAuth=(.*); Max-Age=1800; Path=\/; HttpOnly$/,
           )![1];
 
-          const jwtValues = (await jwt({ secret: jwtSecret }).decorator.jwt.verify(jwtToken)) as {
+          const jwtValues = (await jwt({ secret: config.jwt.secret }).decorator.jwt.verify(
+            jwtToken,
+          )) as {
             userId: string;
             srpClientEphemeralPublic: string;
             exp: number;
@@ -528,7 +532,9 @@ describe("user auth routes", () => {
             /^auth=(.*); Max-Age=604800; Path=\/; HttpOnly$/,
           )![1];
 
-          const jwtValues = (await jwt({ secret: jwtSecret }).decorator.jwt.verify(sessionJwt)) as {
+          const jwtValues = (await jwt({ secret: config.jwt.secret }).decorator.jwt.verify(
+            sessionJwt,
+          )) as {
             userId: string;
             exp: number;
           };

@@ -1,5 +1,5 @@
+import { config } from "@acloud/config";
 import { jwt } from "@elysiajs/jwt";
-import { jwtSecret } from "./config";
 
 /**
  * Only for testing purposes
@@ -7,5 +7,5 @@ import { jwtSecret } from "./config";
  * @returns valid jwt with payload
  */
 export const genJWT = async (payload: Record<string, string | number>) => {
-  return await jwt({ secret: jwtSecret }).decorator.jwt.sign(payload);
+  return await jwt({ secret: config.jwt.secret }).decorator.jwt.sign(payload);
 };

@@ -1,5 +1,5 @@
 import { api } from "@acloud/client/api";
-import { config } from "@acloud/server/config";
+import { config } from "@acloud/config";
 import { resetDB } from "@acloud/server/src/db";
 import { createSignedUpTestUser } from "@acloud/server/src/db/seed";
 import { testUsers } from "@acloud/testing";

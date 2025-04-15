@@ -3,6 +3,12 @@
   "private": true,
   "module": "index.ts",
   "type": "module",
+  "dependencies": {
+    "@acloud/server": "workspace:*",
+    "@acloud/common": "workspace:*",
+    "@acloud/crypto": "workspace:*",
+    "@acloud/config": "workspace:*"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "elysia": "latest",
@@ -10,10 +16,5 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@acloud/server": "workspace:*",
-    "@acloud/common": "workspace:*",
-    "@acloud/crypto": "workspace:*"
   }
 }

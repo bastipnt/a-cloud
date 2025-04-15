@@ -1,4 +1,4 @@
-import { config } from "@acloud/server/config";
+import { config } from "@acloud/config";
 import { resetDB } from "@acloud/server/src/db"; // TODO: maybe also in testing package
 import { createSignedUpTestUser } from "@acloud/server/src/db/seed"; // TODO: maybe also in testing package
 import { testUsers } from "@acloud/testing";

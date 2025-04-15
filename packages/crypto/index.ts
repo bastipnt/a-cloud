@@ -24,3 +24,4 @@ export {
   deriveSrpClientSession,
   verifySrpSession,
 } from "./src/srpClient";
+export { generateServerKeys } from "./generate-server-keys";

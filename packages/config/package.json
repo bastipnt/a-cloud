@@ -1,0 +1,20 @@
+{
+  "name": "@acloud/config",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "gen:config": "bun run generate-config.ts",
+    "gen:test-config": "NODE_ENV=test bun run generate-config.ts"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "@acloud/crypto": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

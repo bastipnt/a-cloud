@@ -1,3 +1,5 @@
+// TODO: do I need this?
+
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 

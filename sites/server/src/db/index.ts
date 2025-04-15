@@ -1,7 +1,7 @@
+import { config } from "@acloud/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { reset } from "drizzle-seed";
-import { dbConf } from "../../config";
 import * as filesSchema from "./schema/files";
 import * as keysSchema from "./schema/keys";
 import * as ottsSchema from "./schema/otts";
@@ -19,7 +19,7 @@ const schema = {
 };
 
 export const db = drizzle(
-  `postgres://${dbConf.user}:${dbConf.password}@${dbConf.host}:${dbConf.port}/${dbConf.name}
+  `postgres://${config.db.user}:${config.db.password}@${config.db.host}:${config.db.port}/${config.db.name}
 `,
   { schema },
 );

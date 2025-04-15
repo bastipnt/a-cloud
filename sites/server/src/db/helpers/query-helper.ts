@@ -1,9 +1,9 @@
+import { config } from "@acloud/config";
 import { getHashBase64 } from "@acloud/crypto";
 import { db } from "..";
-import { serverKeys } from "../../../config";
 
 export const findUserByEmail = async (email: string) => {
-  const emailHash = await getHashBase64(email, serverKeys.hashingKey);
+  const emailHash = await getHashBase64(email, config.serverKeys.hashingKey);
 
   return await db.query.usersTable.findFirst({ where: (u, { eq }) => eq(u.emailHash, emailHash) });
 };
