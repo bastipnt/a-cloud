@@ -6,7 +6,6 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, mock } from "bun:test";
 import { useLocation } from "wouter";
 import SignIn from "./SignIn";
-import "@acloud/testing/types.d.ts"; // TODO: why is it not working in tsconfig???
 
 describe("SignUp", () => {
   let emailField: HTMLInputElement;
