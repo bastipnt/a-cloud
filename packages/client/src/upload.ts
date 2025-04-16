@@ -22,8 +22,7 @@ const combineChunksToFormUploadPart = async (
 };
 
 export const uploadStream = async (encryptedFile: EncryptedFileStream) => {
-  const { encryptedFileStream, lastModifiedMs } = encryptedFile;
-  const path = "/lol";
+  const { encryptedFileStream } = encryptedFile;
   console.log({ encryptedFileStream });
 
   const streamReader = encryptedFileStream.getReader();

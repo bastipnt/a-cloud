@@ -1,7 +1,6 @@
 import { mergeUint8Arrays } from "@acloud/common";
 import sodium from "libsodium-wrappers-sumo";
-import { streamEncryptionChunkSize, type FileStream } from "..";
-import { readFileToStream } from "./util/file-helper";
+import { streamEncryptionChunkSize } from "..";
 
 const getHeader = (): Uint8Array | undefined => {
   const encryptionHeader = localStorage.getItem("encryptionHeader");
