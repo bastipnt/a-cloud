@@ -1,2 +1,2 @@
 export { config } from "./config";
-export { isTestENV, isWebTestENV } from "./config-helper";
+export { isTestENV } from "./config-helper";

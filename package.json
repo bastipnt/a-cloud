@@ -8,8 +8,6 @@
     "build": "bun --filter '*' build",
     "test:server": "bun --filter '@acloud/server' test",
     "test:web": "bun --filter '@acloud/web' test",
-    "test": "concurrently -n server,web -c green,magenta \"bun test:server\" \"bun test:web\"",
-    "test:watch": "concurrently -n server,web -c green,magenta \"bun test:server --watch\" \"bun test:web --watch\"",
     "gen:test-users": "bun --filter '@acloud/testing' gen:test-users",
     "gen:config": "bun --filter '@acloud/config' gen:config",
     "gen:test-config": "bun --filter '@acloud/config' gen:test-config",

@@ -6,25 +6,6 @@ const generateConfig = async () => {
 
   const serverKeys = await generateServerKeys();
 
-  const getDbConfig = (dbConfigName: string, dbName: string) =>
-    `
-${dbConfigName}:
-  host: localhost
-  port: 5432
-  name: ${dbName}
-  user: acloud
-  password: acloud123
-  `.trim();
-
-  const dbConfigs: string[] = [];
-
-  if (isTestENV) {
-    dbConfigs.push(getDbConfig("dbTest", "acloud_test"));
-    dbConfigs.push(getDbConfig("dbTestWeb", "acloud_test_web"));
-  } else {
-    dbConfigs.push(getDbConfig("db", "acloud"));
-  }
-
   const config = `
 serverKeys:
   encryptionKey: ${serverKeys.encryptionKey}
@@ -33,7 +14,12 @@ serverKeys:
 jwt:
   secret: ${serverKeys.jwtSecret}
 
-${dbConfigs.join("\n\n")}
+db:
+  host: localhost
+  port: 5432
+  name: ${isTestENV ? "acloud_test" : "acloud"}
+  user: acloud
+  password: acloud123
 
 endpoint:
   api: "http://localhost:3000"

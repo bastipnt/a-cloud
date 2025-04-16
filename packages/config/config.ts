@@ -44,9 +44,7 @@ interface ServerConfig {
   s3?: S3;
   endpoint: Endpoint;
   internal: Internal;
-  db?: DB;
-  dbTest?: DB;
-  dbTestWeb?: DB;
+  db: DB;
 }
 
 let rawConfig;
