@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  runner-job:
+  test-server-job:
     runs-on: ubuntu-latest
 
     services:
@@ -52,4 +52,4 @@ jobs:
         run: bun run gen:test-config
 
       - name: Run tests
-        run: bun run tests:server
+        run: bun run test:server
