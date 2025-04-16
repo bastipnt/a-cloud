@@ -1,0 +1,55 @@
+name: Test Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  runner-job:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+
+        env:
+          POSTGRES_USER: acloud
+          POSTGRES_PASSWORD: acloud123
+          POSTGRES_DB: acloud_test
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.1.42"
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            dist
+            .cache
+          key: ${{ runner.os }}-build-${{ hashFiles('dist') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate test config
+        run: bun run gen:test-config
+
+      - name: Run tests
+        run: bun run tests:server
