@@ -51,5 +51,8 @@ jobs:
       - name: Generate test config
         run: bun run gen:test-config
 
+      - name: Generate test users
+        run: bun run gen:gen:test-users
+
       - name: Run tests
         run: bun run test:server
