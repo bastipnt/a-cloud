@@ -14,7 +14,20 @@ type ProofSrpAttributes = {
   srpClientEphemeralPublic: string;
 };
 
-export const signIn = async (email: string): Promise<ProofSrpAttributes> => {
+export class SignInError extends Error {
+  override name: string = "Sign in error";
+}
+
+export class NotLoggedInError extends Error {
+  override name: string = "Not logged in";
+}
+
+export const signIn = async (
+  email: string,
+): Promise<{
+  proofSrpAttributes?: ProofSrpAttributes;
+  alreadySignedIn: boolean;
+}> => {
   const { srpClientEphemeralPublic, srpClientEphemeralSecret } = genSrpClientEphemeral();
 
   const res = await api["user-auth"]["sign-in"].post({
@@ -22,9 +35,17 @@ export const signIn = async (email: string): Promise<ProofSrpAttributes> => {
     srpClientEphemeralPublic,
   });
 
-  if (res.status !== 200 || !res.data) throw new Error("Something went wrong signing in");
+  if (res.status !== 200 || !res.data) throw new SignInError();
 
-  return { srpClientEphemeralSecret, srpClientEphemeralPublic, ...res.data };
+  if (res.data.srpSalt === undefined && res.data.srpServerEphemeralPublic === undefined) {
+    if (res.data.message === "already signed in") return { alreadySignedIn: true };
+    throw new Error("Something went wrong");
+  }
+
+  return {
+    proofSrpAttributes: { srpClientEphemeralSecret, srpClientEphemeralPublic, ...res.data },
+    alreadySignedIn: false,
+  };
 };
 
 export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrpAttributes) => {
@@ -42,7 +63,7 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
     srpClientSessionProof,
   });
 
-  if (res.status !== 200 || !res.data) throw new Error("Verify srp failed");
+  if (res.status !== 200 || !res.data || !res.data.srpServerSessionProof) throw new SignInError();
 
   const { srpServerSessionProof } = res.data;
 
@@ -92,7 +113,7 @@ export const finishSignUp = async (password: string) => {
 export const getUser = async () => {
   const res = await api.user.index.get();
 
-  if (res.status !== 200 || !res.data) throw new Error("Not logged in");
+  if (res.status !== 200 || !res.data) throw new NotLoggedInError();
 
   return res.data.userId;
 };

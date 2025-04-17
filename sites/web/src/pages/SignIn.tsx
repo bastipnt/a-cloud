@@ -1,3 +1,5 @@
+import { SignInError } from "@acloud/client";
+import { NotLoggedInError } from "@acloud/client/src/user";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SignInForm, { SignInFormValues } from "../forms/SignInForm";
@@ -6,30 +8,56 @@ import { useStorage } from "../hooks/storage";
 
 const SignIn: React.FC = () => {
   const { getEmail } = useStorage();
-  const { signIn, proofSignIn } = useClient();
+  const { signIn, proofSignIn, getUser } = useClient();
   const [_, navigate] = useLocation();
   const [existingEmail, setExistingEmail] = useState<string>("");
+  const [formError, setFormError] = useState<string>();
 
   const handleSubmit = async (values: SignInFormValues) => {
     const { email, password } = values;
 
-    const srpAttributes = await signIn(email);
+    try {
+      const { alreadySignedIn, proofSrpAttributes } = await signIn(email);
 
-    await proofSignIn(password, srpAttributes);
+      if (alreadySignedIn) return navigate("/");
+      if (!proofSrpAttributes) throw new Error("No srp attributes returned");
+
+      await proofSignIn(password, proofSrpAttributes);
+    } catch (error) {
+      if (error instanceof SignInError) {
+        setFormError("Invalid email, password combination!");
+        return;
+      }
+
+      throw error;
+    }
 
     navigate("/");
   };
 
+  const checkAlreadySignedIn = async () => {
+    try {
+      const userId = await getUser();
+      if (userId) navigate("/");
+    } catch (error) {
+      if (error instanceof NotLoggedInError) return;
+      throw error;
+    }
+  };
+
   useEffect(() => {
+    checkAlreadySignedIn();
+
     const email = getEmail();
     if (!email) return;
 
     setExistingEmail(email);
-  }, []);
+  });
 
   return (
     <>
-      <h1>FinishSignUp</h1>
+      <h1>Sign In</h1>
+      {formError && <p>{formError}</p>}
       <SignInForm handleSubmit={handleSubmit} existingEmail={existingEmail} />
     </>
   );
