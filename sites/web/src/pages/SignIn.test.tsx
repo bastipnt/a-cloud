@@ -29,15 +29,15 @@ describe("SignIn", () => {
 
   const renee = testUsers.renee;
 
+  afterAll(async () => {
+    await resetDB();
+  });
+
   beforeAll(async () => {
     await createSignedUpTestUser("renee");
     verifySrpSessionSpy = spyOn(aCrypto, "verifySrpSession");
     proofSignInSpy = spyOn(client, "proofSignIn");
     signInSpy = spyOn(client, "signIn");
-  });
-
-  afterAll(async () => {
-    await resetDB();
   });
 
   afterEach(() => {

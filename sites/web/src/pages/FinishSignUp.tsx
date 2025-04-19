@@ -1,3 +1,4 @@
+import { NotVerifiedError, UserAlreadyVerifiedError } from "@acloud/client/src/user";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import FinishSignUpForm, { FinishSignUpFormValues } from "../forms/FinishSignUpForm";
@@ -12,8 +13,22 @@ const FinishSignUp: React.FC = () => {
 
   const handleSubmit = async (values: FinishSignUpFormValues) => {
     const { password } = values;
+    let success: boolean = false;
 
-    const success = await finishSignUp(password);
+    try {
+      success = await finishSignUp(password);
+    } catch (error) {
+      if (error instanceof NotVerifiedError) {
+        navigate("/ott");
+        return;
+      } else if (error instanceof UserAlreadyVerifiedError) {
+        navigate("/sign-in");
+        return;
+      }
+
+      throw error;
+    }
+
     if (!success) return;
 
     navigate("/sign-in");

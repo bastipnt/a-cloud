@@ -7,5 +7,7 @@ import { jwt } from "@elysiajs/jwt";
  * @returns valid jwt with payload
  */
 export const genJWT = async (payload: Record<string, string | number>) => {
-  return await jwt({ secret: config.jwt.secret }).decorator.jwt.sign(payload);
+  return await jwt({ name: "jwt", secret: config.jwt.secret, exp: "7d" }).decorator.jwt.sign(
+    payload,
+  );
 };

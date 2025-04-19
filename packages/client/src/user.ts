@@ -22,6 +22,14 @@ export class NotLoggedInError extends Error {
   override name: string = "Not logged in";
 }
 
+export class NotVerifiedError extends Error {
+  override name: string = "Not verified";
+}
+
+export class UserAlreadyVerifiedError extends Error {
+  override name: string = "UserAlreadyVerifiedError";
+}
+
 export const signIn = async (
   email: string,
 ): Promise<{
@@ -106,6 +114,16 @@ export const finishSignUp = async (password: string) => {
     srpParams,
     keyParams,
   });
+
+  console.log(res.error?.value);
+
+  if (res.status === 401 && res.error?.value === "Not Verified") {
+    throw new NotVerifiedError();
+  }
+
+  if (res.status === 400 && res.error?.value === "UserAlreadyVerifiedError") {
+    throw new UserAlreadyVerifiedError();
+  }
 
   return res.status === 200;
 };

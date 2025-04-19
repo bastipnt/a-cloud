@@ -33,7 +33,7 @@ const OTTInnerForm: React.FC<FormProps & FormikProps<OTTFormValues>> = ({
       {touched.email && errors.email && <div>{errors.email}</div>}
 
       <label htmlFor="ott">Token</label>
-      <Field id="ott" name="ott" type="ott" />
+      <Field id="ott" name="ott" />
       {touched.ott && errors.ott && <div>{errors.ott}</div>}
 
       <button type="submit" disabled={isSubmitting}>
@@ -45,8 +45,6 @@ const OTTInnerForm: React.FC<FormProps & FormikProps<OTTFormValues>> = ({
 
 const OTTForm = withFormik<FormProps, OTTFormValues>({
   mapPropsToValues: (props) => {
-    console.log(props);
-
     return {
       email: props.existingEmail || "",
       ott: props.existingOTT || "",

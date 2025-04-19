@@ -112,6 +112,10 @@ class UserEmailNotVerifiedError extends Error {
   override name = "UserEmailNotVerifiedError";
 }
 
+class UserAlreadyVerifiedError extends Error {
+  override name = "UserAlreadyVerifiedError";
+}
+
 class UserAuthController {
   async signUp(signUpParams: {
     email: string;
@@ -249,6 +253,16 @@ class UserAuthController {
 
     if (user === undefined) throw new UserNotFoundError();
     if (!user.hasEmailVerified) throw new UserEmailNotVerifiedError();
+    if (
+      (
+        await db.query.srpsTable.findFirst({
+          where: (s, { eq }) => eq(s.userId, userId),
+          columns: { userId: true },
+        })
+      )?.userId
+    ) {
+      throw new UserAlreadyVerifiedError();
+    }
 
     await db.insert(srpsTable).values({
       userId,
@@ -486,6 +500,8 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
           return error(401, "Unauthorized");
         } else if (e instanceof UserEmailNotVerifiedError) {
           return error(401, "Not Verified");
+        } else if (e instanceof UserAlreadyVerifiedError) {
+          return error(400, e.name);
         }
 
         throw e;

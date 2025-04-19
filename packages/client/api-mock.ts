@@ -56,6 +56,12 @@ mock.module("./api", () => {
         "sign-up": {
           put: mock(api["user-auth"]["sign-up"].put),
         },
+        "verify-ott": {
+          post: mock(api["user-auth"]["verify-ott"].post),
+        },
+        "finish-sign-up": {
+          put: mock(api["user-auth"]["finish-sign-up"].put),
+        },
       },
     } as typeof api,
   };

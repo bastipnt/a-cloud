@@ -1,6 +1,7 @@
+import { genOTT } from "@acloud/crypto";
 import { testUsers } from "@acloud/testing";
 import { eq } from "drizzle-orm";
-import { db } from "..";
+import { db, ottsTable } from "..";
 import { keysTable } from "./schema/keys";
 import { srpsTable } from "./schema/srps";
 import { usersTable } from "./schema/users";
@@ -14,10 +15,16 @@ type Name = keyof typeof testUsers;
 export const createNewTestUser = async (name: Name) => {
   assureTestEnv();
   const testUser = testUsers[name];
+  const ott = genOTT();
 
   await db.insert(usersTable).values({
     ...testUser.emailParams,
     userId: testUser.userId,
+  });
+
+  await db.insert(ottsTable).values({
+    userId: testUser.userId,
+    ott,
   });
 };
 

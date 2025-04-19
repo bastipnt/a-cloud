@@ -6,11 +6,12 @@
     "gen:test-users": "NODE_ENV=test bun run ./generate-test-users.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "tough-cookie": "^5.1.2",
+    "@acloud/config": "workspace:*",
     "@acloud/crypto": "workspace:*",
     "@acloud/server": "workspace:*",
-    "@acloud/config": "workspace:*"
+    "@elysiajs/jwt": "^1.2.0",
+    "@types/bun": "latest",
+    "tough-cookie": "^5.1.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

@@ -8,7 +8,7 @@ import {
   getHashBase64,
 } from "@acloud/crypto";
 import { srpServer } from "@acloud/server/src/srpServer";
-import { genJWT } from "@acloud/server/util";
+import { genJWT } from "./util";
 
 export const genUserId = () => {
   return crypto.randomUUID();
@@ -107,5 +107,3 @@ export const genUser = async (name: string) => {
     jwt,
   };
 };
-
-export { genJWT };
