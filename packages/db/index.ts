@@ -7,7 +7,12 @@ export const migrateDB = () => migrate(db, { migrationsFolder: resolve(__dirname
 
 export const resetDB = () => reset(db, schema);
 
-export { findUserByEmail, findOttByUserId, findUserByUserId } from "./src/helpers/query-helper";
+export {
+  findUserByEmail,
+  findOttByUserId,
+  findUserByUserId,
+  checkUserExistsByUserId,
+} from "./src/helpers/query-helper";
 
 export { usersTable, type UserType } from "./src/schema/users";
 export { keysTable } from "./src/schema/keys";

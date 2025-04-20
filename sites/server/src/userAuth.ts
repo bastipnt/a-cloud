@@ -7,6 +7,7 @@ import {
   getHashBase64,
 } from "@acloud/crypto";
 import {
+  checkUserExistsByUserId,
   db,
   eq,
   findUserByEmail,
@@ -452,9 +453,12 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       };
 
       const { userId, srpClientEphemeralPublic } = tmpSignInAuthValue;
-      // TODO: here
       const srpUserState = store.srp.find((srp) => srp.userId === userId);
       if (!srpUserState) return error(401, { message: "unauthorized" });
+
+      const userExists = await checkUserExistsByUserId(userId);
+
+      if (!userExists) return error(401, { message: "unauthorized" });
 
       const { srpServerEphemeralSecret, srpSalt, srpVerifier } = srpUserState;
       let srpServerSession: Awaited<ReturnType<typeof userAuthController.verifySrpSession>>;
