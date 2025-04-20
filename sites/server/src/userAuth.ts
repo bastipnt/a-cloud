@@ -1,5 +1,11 @@
 import { config } from "@acloud/config";
-import { encryptBoxBase64, genOTT, genSrpAttributes, getHashBase64 } from "@acloud/crypto";
+import {
+  encryptBoxBase64,
+  genOTT,
+  genPassword,
+  genSrpAttributes,
+  getHashBase64,
+} from "@acloud/crypto";
 import {
   db,
   eq,
@@ -217,7 +223,9 @@ class UserAuthController {
 
     // if no user cannot be found in the database, a bogus salt and ephemeral value should be returned, to avoid leaking which users have signed up.
     if (!user) {
-      const fakePassword = (Math.random() + 1).toString(36).substring(2);
+      console.log("Fake user created");
+      const fakePassword = genPassword();
+      console.log(fakePassword); // TODO:
       user = { userId: crypto.randomUUID(), srp: await genSrpAttributes(fakePassword) };
     }
 
@@ -444,8 +452,8 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
       };
 
       const { userId, srpClientEphemeralPublic } = tmpSignInAuthValue;
+      // TODO: here
       const srpUserState = store.srp.find((srp) => srp.userId === userId);
-
       if (!srpUserState) return error(401, { message: "unauthorized" });
 
       const { srpServerEphemeralSecret, srpSalt, srpVerifier } = srpUserState;
@@ -463,6 +471,8 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
         // wrong password
         return error(401, { message: "unauthorized" });
       }
+
+      console.log("lol");
 
       const { proof: srpServerSessionProof, key: srpServerSessionKey } = srpServerSession;
 

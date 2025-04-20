@@ -25,3 +25,4 @@ export {
   verifySrpSession,
 } from "./src/srpClient";
 export { generateServerKeys } from "./generate-server-keys";
+export { genPassword } from "./src/password";

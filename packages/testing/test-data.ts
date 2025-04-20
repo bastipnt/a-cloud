@@ -3,6 +3,7 @@ import {
   deriveSrpClientSession,
   encryptBoxBase64,
   genNewUserKeys,
+  genPassword,
   genSrpAttributes,
   genSrpClientEphemeral,
   getHashBase64,
@@ -12,10 +13,6 @@ import { genJWT } from "./util";
 
 export const genUserId = () => {
   return crypto.randomUUID();
-};
-
-export const genPassword = () => {
-  return crypto.getRandomValues(new BigUint64Array(1))[0]!.toString(36);
 };
 
 export const getEmailParams = async (email: string) => {
