@@ -472,8 +472,6 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
         return error(401, { message: "unauthorized" });
       }
 
-      console.log("lol");
-
       const { proof: srpServerSessionProof, key: srpServerSessionKey } = srpServerSession;
 
       // Remove user srp session from tmp store
