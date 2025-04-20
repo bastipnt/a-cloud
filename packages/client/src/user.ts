@@ -71,9 +71,6 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
     srpClientSessionProof,
   });
 
-  console.log(res.error?.value);
-  console.log(res.data);
-
   if (res.status !== 200 || !res.data || !res.data.srpServerSessionProof) throw new SignInError();
 
   const { srpServerSessionProof } = res.data;
@@ -117,8 +114,6 @@ export const finishSignUp = async (password: string) => {
     srpParams,
     keyParams,
   });
-
-  console.log(res.error?.value);
 
   if (res.status === 401 && res.error?.value === "Not Verified") {
     throw new NotVerifiedError();

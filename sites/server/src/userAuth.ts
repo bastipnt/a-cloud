@@ -224,9 +224,7 @@ class UserAuthController {
 
     // if no user cannot be found in the database, a bogus salt and ephemeral value should be returned, to avoid leaking which users have signed up.
     if (!user) {
-      console.log("Fake user created");
       const fakePassword = genPassword();
-      console.log(fakePassword); // TODO:
       user = { userId: crypto.randomUUID(), srp: await genSrpAttributes(fakePassword) };
     }
 

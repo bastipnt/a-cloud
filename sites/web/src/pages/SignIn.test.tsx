@@ -107,8 +107,6 @@ describe("SignIn", () => {
         const { password } = renee;
         const email = "invalid@example.com";
 
-        console.log("Renee password:", password);
-
         fireEvent.change(emailField, { target: { value: email } });
         fireEvent.change(passwordField, { target: { value: password } });
         fireEvent.click(submitButton);
