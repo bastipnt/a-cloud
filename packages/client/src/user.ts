@@ -71,6 +71,9 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
     srpClientSessionProof,
   });
 
+  console.log(res.error?.value);
+  console.log(res.data);
+
   if (res.status !== 200 || !res.data || !res.data.srpServerSessionProof) throw new SignInError();
 
   const { srpServerSessionProof } = res.data;

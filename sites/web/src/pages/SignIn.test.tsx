@@ -126,11 +126,11 @@ describe("SignIn", () => {
         expect(await screen.findByText("Invalid email, password combination!")).toBeDefined();
 
         await waitFor(() => {
-          expect(verifySrpSessionSpy).not.toHaveBeenCalled();
+          expect(proofSignInSpy).toHaveReturned();
         });
 
         await waitFor(() => {
-          expect(proofSignInSpy).toHaveReturned();
+          expect(verifySrpSessionSpy).not.toHaveBeenCalled();
         });
 
         expect(useLocation()[1]).not.toHaveBeenCalledWith("/");
