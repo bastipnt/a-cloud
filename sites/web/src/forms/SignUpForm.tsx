@@ -17,12 +17,20 @@ const SignUpInnerForm: React.FC<FormikProps<SignUpFormValues>> = ({
   isSubmitting,
 }) => {
   return (
-    <Form>
-      <label htmlFor="email">Email</label>
-      <Field id="email" type="email" name="email" placeholder="annie@mail.org" />
-      {touched.email && errors.email && <div>{errors.email}</div>}
+    <Form className="flex w-3xs flex-col gap-4 p-4">
+      <div className="flex flex-col">
+        <label htmlFor="email">Email</label>
+        <Field
+          className="border p-1"
+          id="email"
+          type="email"
+          name="email"
+          placeholder="annie@mail.org"
+        />
+        {touched.email && errors.email && <div>{errors.email}</div>}
+      </div>
 
-      <button type="submit" disabled={isSubmitting}>
+      <button className="cursor-pointer border p-1" type="submit" disabled={isSubmitting}>
         Submit
       </button>
     </Form>

@@ -1,7 +1,7 @@
 import { getUser } from "@acloud/client";
 import { NotLoggedInError } from "@acloud/client/src/user";
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import SignUpForm, { SignUpFormValues } from "../forms/SignUpForm";
 import { useClient } from "../hooks/client";
 import { useStorage } from "../hooks/storage";
@@ -38,6 +38,7 @@ const SignUp: React.FC = () => {
     <>
       <h1>SignUp</h1>
       <SignUpForm handleSubmit={handleSubmit} />
+      or <Link to="/sign-in">sign in</Link>
     </>
   );
 };

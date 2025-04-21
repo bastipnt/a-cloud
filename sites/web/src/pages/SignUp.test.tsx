@@ -24,6 +24,16 @@ describe("SignUp", () => {
       submitButton = screen.getByRole<HTMLButtonElement>("button", { name: /submit/i });
     });
 
+    it("shows a link, that redirects to /sing-in", async () => {
+      const signInLink = screen.getByRole<HTMLAnchorElement>("link", { name: /sign in/i });
+      expect(signInLink.href).toBe("http://localhost:5173/sign-in");
+      fireEvent.click(signInLink);
+
+      await waitFor(() => {
+        expect(window.location.href).toBe("http://localhost:5173/sign-in");
+      });
+    });
+
     describe("valid form params", () => {
       it("creates a new user", async () => {
         const { email } = ben;

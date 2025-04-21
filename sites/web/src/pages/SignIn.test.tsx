@@ -64,6 +64,16 @@ describe("SignIn", () => {
       expect(submitButton.type).toBe("submit");
     });
 
+    it("shows a link, that redirects to /sing-up", async () => {
+      const signUpLink = screen.getByRole<HTMLAnchorElement>("link", { name: /sign up/i });
+      expect(signUpLink.href).toBe("http://localhost:5173/sign-up");
+      fireEvent.click(signUpLink);
+
+      await waitFor(() => {
+        expect(window.location.href).toBe("http://localhost:5173/sign-up");
+      });
+    });
+
     describe("valid form values", () => {
       it("signs in the user", async () => {
         const { email, password } = renee;
