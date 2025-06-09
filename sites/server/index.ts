@@ -13,10 +13,11 @@ export const app = new Elysia()
       origin: "localhost:5173",
     }),
   )
-  .use(routes);
-
-app.listen(3000);
+  .use(routes)
+  .listen(3000);
 
 console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 
 export type App = typeof app;
+
+export { type KeyParams } from "./src/userAuth";

@@ -2,6 +2,7 @@
   "name": "@acloud/common",
   "private": true,
   "module": "index.ts",
+  "main": "index.ts",
   "devDependencies": {
     "@types/bun": "latest"
   },

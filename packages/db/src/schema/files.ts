@@ -1,5 +1,5 @@
-import { relations } from "drizzle-orm";
-import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { relations, type InferSelectModel } from "drizzle-orm";
+import { boolean, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { getDateNow } from "../helpers/default-value-helpers";
 import { usersTable } from "./users";
 
@@ -8,15 +8,28 @@ export const filesTable = pgTable("files", {
     .$defaultFn(() => crypto.randomUUID())
     .primaryKey(),
 
+  parentId: varchar(),
+
+  isDir: boolean()
+    .notNull()
+    .$defaultFn(() => false),
+
+  isLocal: boolean()
+    .notNull()
+    .$defaultFn(() => true),
+
   ownerId: varchar()
     .notNull()
     .references(() => usersTable.userId),
 
-  fileDecryptionHeader: varchar().notNull(),
+  fileDecryptionHeader: varchar(),
   thumbnailDecryptionHeader: varchar(),
+  metadataDecryptionHeader: varchar(),
 
-  metadataDecryptionHeader: varchar().notNull(),
-  encryptedMetadata: varchar().notNull(), // encrypted with `mainKey` and  `metadateDecryptionHeader`
+  encryptedMetadata: varchar().notNull(),
+
+  encryptedFileKey: varchar().notNull(),
+  fileKeyNonce: varchar().notNull(),
 
   createdAt: timestamp()
     .notNull()
@@ -32,3 +45,12 @@ export const filesUsersRelations = relations(filesTable, ({ one }) => ({
     references: [usersTable.userId],
   }),
 }));
+
+export const filesFilesRelations = relations(filesTable, ({ one }) => ({
+  parent: one(filesTable, {
+    fields: [filesTable.parentId],
+    references: [filesTable.fileId],
+  }),
+}));
+
+export type FileType = InferSelectModel<typeof filesTable>;

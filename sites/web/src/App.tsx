@@ -6,29 +6,11 @@ import Index from "./pages/Index";
 import OTT from "./pages/OTT";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import Provider from "./providers";
 
 function App() {
-  // const { downloadFile } = useClient();
-  // const { decryptFile } = useCrypto();
-  // const imgRef = useRef<HTMLImageElement>(null);
-
-  // const download = async () => {
-  //   const encryptedFile = await downloadFile(
-  //     "0195fbcb-6df3-7000-a48c-9359afc1b921"
-  //   );
-  //   if (!encryptedFile) return;
-
-  //   const decryptedData = await decryptFile(encryptedFile);
-
-  //   if (imgRef.current && decryptedData) {
-  //     const imgFile = new Blob([decryptedData], { type: "img/png" });
-  //     const imgUrl = URL.createObjectURL(imgFile);
-  //     imgRef.current.src = imgUrl;
-  //   }
-  // };
-
   return (
-    <>
+    <Provider>
       <Layout>
         <Switch>
           <Route path="/" component={Index} />
@@ -41,7 +23,7 @@ function App() {
           <Route>404: Page not found!</Route>
         </Switch>
       </Layout>
-    </>
+    </Provider>
   );
 }
 

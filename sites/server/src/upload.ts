@@ -1,19 +1,63 @@
-import { randomUUIDv7 } from "bun";
+import { resolve } from "path";
+import { db, eq, filesTable } from "@acloud/db";
 import Elysia, { t } from "elysia";
+import { withUserId } from "./user";
 
-const dataDir = Bun.env.DATA_DIR;
+// TODO: make configable
+export const dataDir = resolve(__dirname, "../../../data");
 
-export const uploadRoutes = new Elysia({ prefix: "/upload" }).post(
-  "/file",
-  async ({ body: { file } }) => {
-    const uuid = randomUUIDv7();
+class FileStoreError extends Error {
+  override name: string = "FileStoreError";
+}
 
-    console.log(file.size, file.name, dataDir);
-    Bun.write([dataDir, uuid].join("/"), file);
-  },
-  {
-    body: t.Object({
-      file: t.File(),
-    }),
-  },
-);
+const fileUploadBody = t.Object({
+  file: t.File(),
+});
+
+const storeFileParams = t.Object({
+  fileId: t.String(),
+});
+
+class UploadController {
+  async storeFile(userId: string, fileId: string, file: File, isThumbnail = false) {
+    const fileType = isThumbnail ? "thumbnail" : "file";
+    const bytes = await Bun.write([dataDir, userId, fileType, fileId].join("/"), file);
+    if (bytes === 0) throw new FileStoreError();
+
+    await db.update(filesTable).set({ isLocal: true }).where(eq(filesTable.fileId, fileId));
+  }
+}
+
+const uploadService = new Elysia({ name: "upload/service" }).model({
+  storeFileParams,
+  fileUploadBody,
+});
+
+export const uploadRoutes = new Elysia({ prefix: "/upload" })
+  .use(withUserId)
+  .use(uploadService)
+  .decorate("uploadController", new UploadController())
+  .post(
+    "/file/:fileId",
+    async ({ body: { file }, params: { fileId }, uploadController, userId }) => {
+      await uploadController.storeFile(userId, fileId, file);
+
+      return { message: "stored file", fileId };
+    },
+    {
+      body: "fileUploadBody",
+      params: "storeFileParams",
+    },
+  )
+  .post(
+    "/thumbnail/:fileId",
+    async ({ body: { file }, params: { fileId }, uploadController, userId }) => {
+      await uploadController.storeFile(userId, fileId, file, true);
+
+      return { message: "stored file", fileId };
+    },
+    {
+      body: "fileUploadBody",
+      params: "storeFileParams",
+    },
+  );

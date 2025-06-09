@@ -1,5 +1,7 @@
-export { cookieFromJSON, parseCookie, registerCookieJar, splitCookies } from "./cookieJar";
+import testUsers from "./test-users.json" with { type: "json" };
 
-export { default as testUsers } from "./test-users.json";
+export { testUsers };
+
+export { cookieFromJSON, parseCookie, registerCookieJar, splitCookies } from "./cookieJar";
 
 export { genJWT } from "./util";

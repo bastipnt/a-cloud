@@ -60,3 +60,6 @@ config.*.yaml
 
 data
 test-users.json
+
+test-results
+playwright-report

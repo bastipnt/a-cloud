@@ -30,6 +30,10 @@ interface S3 {
   };
 }
 
+interface Storage {
+  dataDir: string;
+}
+
 interface Endpoint {
   api: string;
 }
@@ -42,6 +46,7 @@ interface ServerConfig {
   serverKeys: ServerKeys;
   jwt: JWT;
   s3?: S3;
+  storage?: Storage;
   endpoint: Endpoint;
   internal: Internal;
   db: DB;
@@ -50,7 +55,13 @@ interface ServerConfig {
 let rawConfig;
 
 try {
-  rawConfig = await Bun.file(configPath).text();
+  if (typeof Bun !== "undefined") {
+    rawConfig = await Bun.file(configPath).text();
+  } else {
+    const fs = await import("node:fs/promises");
+
+    rawConfig = await fs.readFile(configPath, "utf8");
+  }
 } catch (error) {
   console.error(`failed to load config from ${configPath}`);
   console.error("please generate it with: bun run gen:config or bun run gen:test-config");

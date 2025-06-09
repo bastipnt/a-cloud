@@ -1,32 +1,24 @@
 import sodium from "libsodium-wrappers-sumo";
-import { type EncryptedFileStream } from "..";
 import { genNonce } from "./generate";
 import { fromBase64, toBase64 } from "./util/conversion-helper";
-import { readFileToStream } from "./util/file-helper";
+import { blobToUnit8Array, fileStreamToFile, readFileToStream } from "./util/file-helper";
 
-const genOrGetKey = (): Uint8Array => {
-  const encryptionKey = localStorage.getItem("encryptionKey");
-  if (encryptionKey) {
-    return new Uint8Array(JSON.parse(encryptionKey));
-  }
-
-  const newKey = sodium.crypto_secretstream_xchacha20poly1305_keygen();
-  localStorage.setItem("encryptionKey", JSON.stringify(Array.from(newKey)));
-
-  return newKey;
+type FileParams = {
+  decryptionHeader: Base64URLString;
+  chunkCount: number;
+  fileSize: number;
+  lastModifiedMs: number;
 };
 
-const setHeader = (header: Uint8Array) => {
-  localStorage.setItem("encryptionHeader", JSON.stringify(Array.from(header)));
-};
-
-export const encryptFile = async (file: File): Promise<EncryptedFileStream> => {
+export const encryptFile = async (
+  file: File,
+  fileKey: Base64URLString,
+): Promise<[File, FileParams]> => {
   await sodium.ready;
-
-  const key = genOrGetKey();
-  const initPushRes = sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
-  const [pushState, header] = [initPushRes.state, initPushRes.header];
-  setHeader(header);
+  const initPushResult = sodium.crypto_secretstream_xchacha20poly1305_init_push(
+    await fromBase64(fileKey),
+  );
+  const { state, header } = initPushResult;
 
   const { stream, chunkCount, fileSize, lastModifiedMs } = await readFileToStream(file);
 
@@ -44,7 +36,7 @@ export const encryptFile = async (file: File): Promise<EncryptedFileStream> => {
         : sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE;
 
       const encryptedFileChunk = sodium.crypto_secretstream_xchacha20poly1305_push(
-        pushState,
+        state,
         value,
         null,
         tag,
@@ -59,30 +51,35 @@ export const encryptFile = async (file: File): Promise<EncryptedFileStream> => {
     },
   });
 
-  return {
-    encryptedFileStream,
-    decryptionHeader: header,
-    chunkCount,
-    fileSize,
-    lastModifiedMs,
-  };
+  return [
+    await fileStreamToFile(encryptedFileStream),
+    {
+      decryptionHeader: await toBase64(header),
+      chunkCount,
+      fileSize,
+      lastModifiedMs,
+    },
+  ];
 };
 
-export const encryptBoxBase64 = async (data: string, key: string): Promise<[string, string]> => {
-  await sodium.ready;
+export const encryptBlobToFile = async (
+  blob: Blob,
+  key: Base64URLString,
+): Promise<[File, Base64URLString]> => {
+  const blobArr = await blobToUnit8Array(blob);
 
-  const nonce = await genNonce();
+  const [encryptedBlob, header] = await encryptUnit8ArrayBase64(blobArr, key);
 
-  const encryptedData = await encryptBoxWithNonceBase64(data, key, nonce);
+  const encryptedFile = new File([new Blob([await fromBase64(encryptedBlob)])], "encrypted-file");
 
-  return [encryptedData, await toBase64(nonce)];
+  return [encryptedFile, header];
 };
 
 export const encryptBoxWithNonceBase64 = async (
-  data: string,
-  key: string,
+  data: Base64URLString,
+  key: Base64URLString,
   nonce: Uint8Array,
-): Promise<string> => {
+): Promise<Base64URLString> => {
   await sodium.ready;
 
   const encryptedData = sodium.crypto_secretbox_easy(
@@ -92,4 +89,47 @@ export const encryptBoxWithNonceBase64 = async (
   );
 
   return await toBase64(encryptedData);
+};
+
+/**
+ *
+ * @param data
+ * @param key
+ * @returns [data, nonce]
+ */
+export const encryptBoxBase64 = async (
+  data: Base64URLString,
+  key: Base64URLString,
+): Promise<[Base64URLString, Base64URLString]> => {
+  await sodium.ready;
+
+  const nonce = await genNonce();
+
+  const encryptedData = await encryptBoxWithNonceBase64(data, key, nonce);
+
+  return [encryptedData, await toBase64(nonce)];
+};
+
+export const encryptObject = (value: object, key: Base64URLString) =>
+  encryptUnit8ArrayBase64(new TextEncoder().encode(JSON.stringify(value)), key);
+
+export const encryptUnit8ArrayBase64 = async (
+  data: Uint8Array,
+  key: Base64URLString,
+): Promise<[Base64URLString, Base64URLString]> => {
+  await sodium.ready;
+
+  const initPushResult = sodium.crypto_secretstream_xchacha20poly1305_init_push(
+    await fromBase64(key),
+  );
+  const { state, header } = initPushResult;
+
+  const encryptedData = sodium.crypto_secretstream_xchacha20poly1305_push(
+    state,
+    data,
+    null,
+    sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL,
+  );
+
+  return [await toBase64(encryptedData), await toBase64(header)];
 };

@@ -1,6 +1,4 @@
-export { multipartStreamUpload } from "./src/multipart-upload";
-export { uploadStream } from "./src/upload";
-export { downloadFile } from "./src/download";
+export { loadThumbnail, type LoadThumbnailParams } from "./src/download";
 export {
   signIn,
   proofSignIn,
@@ -10,3 +8,6 @@ export {
   getUser,
   SignInError,
 } from "./src/user";
+
+export { uploadFiles } from "./src/upload";
+export { getFiles, FilesLoadingError } from "./src/file";

@@ -11,7 +11,7 @@ describe("user routes", () => {
   describe("[GET] /", () => {
     describe("signed in", () => {
       it("returns an existing userId", async () => {
-        const { data } = await api.user.index.get({
+        const { data } = await api.user.get({
           headers: {
             Cookie: `auth=${ty.jwt}`,
           },
@@ -26,7 +26,7 @@ describe("user routes", () => {
 
     describe("signed out", () => {
       it("returns 401", async () => {
-        const res = await api.user.index.get();
+        const res = await api.user.get();
 
         expect(res.status).toBe(401);
       });
@@ -34,7 +34,7 @@ describe("user routes", () => {
 
     describe("invalid JWT", () => {
       it("returns 401", async () => {
-        const res = await api.user.index.get({
+        const res = await api.user.get({
           headers: {
             Cookie: "invalid",
           },

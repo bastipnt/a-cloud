@@ -1,3 +1,5 @@
+// https://github.com/elysiajs/eden/issues/126
+
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 const OriginalRequest = Request;

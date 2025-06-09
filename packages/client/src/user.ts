@@ -71,7 +71,8 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
     srpClientSessionProof,
   });
 
-  if (res.status !== 200 || !res.data || !res.data.srpServerSessionProof) throw new SignInError();
+  if (res.status !== 200 || !res.data) throw new SignInError();
+  if (!("srpServerSessionProof" in res.data)) throw new SignInError();
 
   const { srpServerSessionProof } = res.data;
 
@@ -81,6 +82,8 @@ export const proofSignIn = async (password: string, proofSrpAttributes: ProofSrp
     srpClientSessionKey,
     srpServerSessionProof,
   );
+
+  return res.data.keyParams!;
 };
 
 /**
@@ -127,7 +130,7 @@ export const finishSignUp = async (password: string) => {
 };
 
 export const getUser = async () => {
-  const res = await api.user.index.get();
+  const res = await api.user.get();
 
   if (res.status !== 200 || !res.data) throw new NotLoggedInError();
 

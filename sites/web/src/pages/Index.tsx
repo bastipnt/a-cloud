@@ -1,6 +1,8 @@
 import { NotLoggedInError } from "@acloud/client/src/user";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import FileTable from "../components/FileTable";
+import FileUpload from "../components/FileUpload";
 import { useClient } from "../hooks/client";
 
 const Index: React.FC = () => {
@@ -24,12 +26,15 @@ const Index: React.FC = () => {
 
   useEffect(() => {
     checkSignedIn();
-  });
+    window.localStorage.setItem("test", "hello");
+  }, []);
 
   return (
     <>
       <h1>Index</h1>
       <p>User id: {userId}</p>
+      <FileTable />
+      <FileUpload />
     </>
   );
 };

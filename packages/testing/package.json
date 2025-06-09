@@ -1,6 +1,7 @@
 {
   "name": "@acloud/testing",
   "module": "index.ts",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
     "gen:test-users": "NODE_ENV=test bun run ./generate-test-users.ts"

@@ -1,13 +1,13 @@
 import { genOTT } from "@acloud/crypto";
+import { db, ottsTable } from "@acloud/db";
 import { testUsers } from "@acloud/testing";
 import { eq } from "drizzle-orm";
-import { db, ottsTable } from "..";
 import { keysTable } from "./schema/keys";
 import { srpsTable } from "./schema/srps";
 import { usersTable } from "./schema/users";
 
 const assureTestEnv = () => {
-  if (Bun.env.NODE_ENV !== "test") throw new Error("Not a test environment");
+  if (process.env.NODE_ENV !== "test") throw new Error("Not a test environment");
 };
 
 type Name = keyof typeof testUsers;

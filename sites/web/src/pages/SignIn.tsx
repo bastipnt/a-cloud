@@ -4,17 +4,20 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import SignInForm, { SignInFormValues } from "../forms/SignInForm";
 import { useClient } from "../hooks/client";
+import { useCrypto } from "../hooks/crypto";
 import { useStorage } from "../hooks/storage";
 
 const SignIn: React.FC = () => {
-  const { getEmail } = useStorage();
+  const { getEmail, storeKeyEncryptionKey, storeKeyParams } = useStorage();
   const { signIn, proofSignIn, getUser } = useClient();
+  const { deriveKeyBase64 } = useCrypto();
   const [_, navigate] = useLocation();
   const [existingEmail, setExistingEmail] = useState<string>("");
   const [formError, setFormError] = useState<string>();
 
   const handleSubmit = async (values: SignInFormValues) => {
     const { email, password } = values;
+    let keyParams: Awaited<ReturnType<typeof proofSignIn>>;
 
     try {
       const { alreadySignedIn, proofSrpAttributes } = await signIn(email);
@@ -22,7 +25,7 @@ const SignIn: React.FC = () => {
       if (alreadySignedIn) return navigate("/");
       if (!proofSrpAttributes) throw new Error("No srp attributes returned");
 
-      await proofSignIn(password, proofSrpAttributes);
+      keyParams = await proofSignIn(password, proofSrpAttributes);
     } catch (error) {
       if (error instanceof SignInError) {
         setFormError("Invalid email, password combination!");
@@ -31,6 +34,16 @@ const SignIn: React.FC = () => {
 
       throw error;
     }
+
+    storeKeyParams(keyParams);
+
+    const keyEncryptionKey = await deriveKeyBase64(
+      password,
+      keyParams.keyEncryptionKeySalt,
+      keyParams.opsLimit,
+      keyParams.memLimit,
+    );
+    storeKeyEncryptionKey(keyEncryptionKey);
 
     navigate("/");
   };

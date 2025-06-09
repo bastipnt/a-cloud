@@ -8,35 +8,40 @@
     "build": "bun --filter '*' build",
     "test:server": "bun --filter '@acloud/server' test",
     "test:web": "bun --filter '@acloud/web' test",
+    "test:e2e": "bun --filter '@acloud/e2e' test:e2e",
     "gen:test-users": "bun --filter '@acloud/testing' gen:test-users",
     "gen:config": "bun --filter '@acloud/config' gen:config",
     "gen:test-config": "bun --filter '@acloud/config' gen:test-config",
-    "lint": "eslint .",
+    "gen:migrations": "bun --filter '@acloud/db' gen:migrations",
+    "dev:reset-db": "bun --filter '@acloud/db' dev:reset-db",
+    "lint": "tsc --noEmit && eslint .",
+    "lint:fix": "tsc --noEmit && eslint --fix .",
+    "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "check": "prettier --check ."
+    "typecheck": "tsc --noEmit"
   },
   "workspaces": [
     "packages/*",
     "sites/*"
   ],
   "devDependencies": {
-    "@eslint/css": "^0.6.0",
-    "@eslint/js": "^9.24.0",
-    "@eslint/json": "^0.11.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
+    "@eslint/css": "^0.8.1",
+    "@eslint/js": "^9.28.0",
+    "@eslint/json": "^0.12.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
     "@types/bun": "latest",
     "concurrently": "^9.1.2",
-    "eslint": "^9.24.0",
-    "eslint-config-prettier": "^10.1.2",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.2.0",
     "prettier": "3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
-    "typescript-eslint": "^8.29.1"
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "typescript-eslint": "^8.33.1"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.8.3"
   }
 }

@@ -1,6 +1,7 @@
 {
   "name": "@acloud/config",
   "module": "index.ts",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
     "gen:config": "bun run generate-config.ts",

@@ -1,54 +1,66 @@
-import { AFile } from "@acloud/media";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { useClient } from "../hooks/client";
-import { useCrypto } from "../hooks/crypto";
+import { useStorage } from "../hooks/storage";
+import { FilesContext } from "../providers/filesProvider";
 
-const FileUploadSingle: React.FC = () => {
-  const [aFiles, setAFiles] = useState<AFile[]>();
-  const { uploadStream } = useClient();
-  const { encryptFile } = useCrypto();
+const FileUpload: React.FC = () => {
+  const { setFiles } = useContext(FilesContext);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>();
+  const { uploadFiles } = useClient();
+  const { getMainKeyBase64 } = useStorage();
+  const [showUploadedMessage, setShowUploadedMessage] = useState(false);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newAFiles = [];
+      const newFiles = [];
 
       for (const file of e.target.files) {
-        const aFile = new AFile(file);
-        newAFiles.push(aFile);
-        console.log(aFile);
+        newFiles.push(file);
       }
 
-      setAFiles(newAFiles);
+      setSelectedFiles(newFiles);
     }
   };
 
   const handleUploadClick = async () => {
-    if (!aFiles || aFiles.length === 0) {
-      return;
-    }
+    if (!selectedFiles || selectedFiles.length === 0) return;
+    const mainKey = await getMainKeyBase64();
 
-    const encryptedFile = await encryptFile(aFiles[0].file);
+    const uploadedFiles = await uploadFiles(selectedFiles, mainKey);
 
-    await uploadStream(encryptedFile);
+    setShowUploadedMessage(true);
+    setFiles(uploadedFiles);
   };
 
   return (
     <div>
-      <input multiple type="file" onChange={handleFileChange} />
+      {showUploadedMessage && <p>Files uploaded!</p>}
 
-      {aFiles && (
+      <label htmlFor="upload">Upload File</label>
+      <input
+        name="upload"
+        id="upload"
+        className="border p-1"
+        multiple
+        type="file"
+        onChange={handleFileChange}
+      />
+
+      {selectedFiles && (
         <ul>
-          {Object.values(aFiles).map((aFile) => (
-            <li key={aFile.file.name}>
-              {aFile.file.name} - {aFile.file.type}
+          {Object.values(selectedFiles).map((selectedFile) => (
+            <li key={selectedFile.name}>
+              {selectedFile.name} - {selectedFile.type}
             </li>
           ))}
         </ul>
       )}
 
-      <button onClick={handleUploadClick}>Upload</button>
+      <button onClick={handleUploadClick} name="upload">
+        Upload
+      </button>
     </div>
   );
 };
 
-export default FileUploadSingle;
+export default FileUpload;

@@ -3,6 +3,12 @@ import type { UserKeys } from "../types";
 import { encryptBoxBase64 } from "./encrypt";
 import { fromBase64, toBase64 } from "./util/conversion-helper";
 
+export const genFileKeyBase64 = async () => {
+  await sodium.ready;
+
+  return await toBase64(sodium.crypto_secretstream_xchacha20poly1305_keygen());
+};
+
 export const genRandomBytesBase64 = async (lenBytes: number) => {
   await sodium.ready;
   return await toBase64(sodium.randombytes_buf(lenBytes));

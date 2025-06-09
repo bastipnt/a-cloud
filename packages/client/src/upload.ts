@@ -1,37 +1,103 @@
-import { mergeUint8Arrays } from "@acloud/common";
-import type { EncryptedFileStream } from "@acloud/crypto";
+import { createCryptoWorker, encryptObject, genFileKeyBase64 } from "@acloud/crypto";
+import {
+  detectFileType,
+  generateImageThumbnailCanvas,
+  type FileData,
+  type FileMetadata,
+} from "@acloud/media";
 import { api } from "../api";
 
-const combineChunksToFormUploadPart = async (
-  streamReader: ReadableStreamDefaultReader<Uint8Array>,
-) => {
-  const combinedChunks: Uint8Array<ArrayBufferLike>[] = [];
+export class FileSaveError extends Error {
+  override name: string = "FileSaveError";
+}
 
-  const handleChunk = async () => {
-    const { done, value: chunk } = await streamReader.read();
-    console.log(done, chunk);
+export class FileUploadError extends Error {
+  override name: string = "FileUploadError";
+}
 
-    if (done) return;
+export class ThumbnailUploadError extends Error {
+  override name: string = "ThumbnailUploadError";
+}
 
-    combinedChunks.push(chunk);
-    await handleChunk();
+const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileData> => {
+  const fileKey = await genFileKeyBase64();
+  const fileType = await detectFileType(file);
+
+  const cryptoWorker = await createCryptoWorker().remote;
+
+  let encryptedThumbnail: File | undefined;
+  let thumbnailDecryptionHeader: Base64URLString | undefined;
+
+  if (fileType.startsWith("image/")) {
+    const thumbnail = await generateImageThumbnailCanvas(file);
+    [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
+      thumbnail,
+      fileKey,
+    );
+  }
+
+  const [encryptedFile, fileParams] = await cryptoWorker.encryptFile(file, fileKey);
+
+  const fileName = file.name;
+  const metadata: FileMetadata = {
+    fileName,
+    chunkCount: fileParams.chunkCount,
+    fileSize: fileParams.fileSize,
+    lastModifiedMs: fileParams.lastModifiedMs,
   };
 
-  await handleChunk();
-  return mergeUint8Arrays(combinedChunks);
+  const [encryptedMetadata, metadataDecryptionHeader] = await encryptObject(metadata, fileKey);
+
+  const [encryptedFileKey, fileKeyNonce] = await cryptoWorker.encryptBoxBase64(fileKey, mainKey);
+
+  const fileDecryptionHeader = fileParams.decryptionHeader;
+
+  const res = await api.files.post({
+    encryptedFileKey,
+    fileKeyNonce,
+
+    fileDecryptionHeader,
+    thumbnailDecryptionHeader,
+
+    encryptedMetadata,
+    metadataDecryptionHeader,
+  });
+
+  if (res.status !== 200) throw new FileSaveError();
+
+  const fileId = res.data!.fileId;
+
+  const uploadRes = await api.upload.file({ fileId }).post({ file: encryptedFile });
+
+  if (uploadRes.status !== 200) throw new FileUploadError();
+
+  if (encryptedThumbnail) {
+    const uploadThumbnailRes = await api.upload
+      .thumbnail({ fileId })
+      .post({ file: encryptedThumbnail });
+
+    if (uploadThumbnailRes.status !== 200) throw new ThumbnailUploadError();
+  }
+
+  return {
+    fileId,
+    fileKey,
+    metadata,
+    fileDecryptionHeader,
+    thumbnailDecryptionHeader: thumbnailDecryptionHeader || null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 };
 
-export const uploadStream = async (encryptedFile: EncryptedFileStream) => {
-  const { encryptedFileStream } = encryptedFile;
-  console.log({ encryptedFileStream });
+export const uploadFiles = async (files: File[], mainKey: Base64URLString) => {
+  const uploadedFileIds: FileData[] = [];
 
-  const streamReader = encryptedFileStream.getReader();
-  const uploadChunks = await combineChunksToFormUploadPart(streamReader);
-  console.log({ uploadChunks });
+  for (const file of files) {
+    const fileData = await uploadFile(file, mainKey);
+    if (!fileData) console.error("Upload error");
+    uploadedFileIds.push(fileData);
+  }
 
-  const uploadFile = new File([new Blob([uploadChunks])], "hello");
-
-  const res = await api.upload.file.post({ file: uploadFile });
-
-  console.log(res);
+  return uploadedFileIds;
 };

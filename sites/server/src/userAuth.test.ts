@@ -424,7 +424,9 @@ describe("user auth routes", () => {
             srpClientEphemeralPublic,
           });
 
-          const userSrp = userAuthRoutes.store.srp.find(({ userId }) => userId === user.userId);
+          const userSrp = userAuthRoutes.store.srp.signInUsers.find(
+            ({ userId }) => userId === user.userId,
+          );
 
           expect(userSrp).toMatchObject({
             userId: user.userId,
@@ -586,7 +588,7 @@ describe("user auth routes", () => {
             peter.signUpParams.srpParams.srpVerifier,
           );
 
-          userAuthRoutes.store.srp.push({
+          userAuthRoutes.store.srp.signInUsers.push({
             userId: user.userId,
             srpServerEphemeralSecret: srpServerEphemeral.secret,
             srpSalt: peter.signUpParams.srpParams.srpSalt,
@@ -609,8 +611,8 @@ describe("user auth routes", () => {
             { headers: { Cookie: `auth=${peter.jwt}` } },
           );
 
-          expect(res.status).toBe(200);
-          expect(res.data?.message).toBe("already signed in");
+          expect(res.status).toBe(208);
+          expect("message" in res.data! && res.data!.message).toBe("already signed in");
         });
       });
     });

@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { getFullPath } from "@acloud/config";
 import { genUser } from "./test-data";
 
 const generateTestData = async () => {
@@ -13,7 +13,7 @@ const generateTestData = async () => {
     testUsers[name] = testUser;
   }
 
-  const testDataFilePath = resolve(__dirname, "./test-users.json");
+  const testDataFilePath = getFullPath(import.meta.url, "./test-users.json");
   await Bun.write(testDataFilePath, JSON.stringify(testUsers));
 
   console.log("Test data generated in ./test-data/test-data.json");

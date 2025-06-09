@@ -3,23 +3,26 @@ import { routes } from "@acloud/server/routes";
 import { parseCookie, splitCookies } from "@acloud/testing";
 import { treaty } from "@elysiajs/eden";
 import { mock } from "bun:test";
+import { type Cookie } from "tough-cookie";
 
 const url = config.endpoint.api;
+let cookies: Cookie[];
 
 mock.module("./api", () => {
   const api = treaty(routes, {
     fetch: { credentials: "include" },
     async onRequest() {
-      const cookies = await cookieJar.getCookies(url);
+      cookies = await cookieJar.getCookies(url);
 
       if (cookies.length > 0) {
         const cookie = cookies[0]?.toString();
 
-        return {
-          headers: {
-            cookie,
-          },
-        };
+        if (cookie)
+          return {
+            headers: {
+              cookie,
+            },
+          };
       }
 
       return;
@@ -41,9 +44,7 @@ mock.module("./api", () => {
     api: {
       ...api,
       user: {
-        index: {
-          get: mock(api.user.index.get),
-        },
+        get: mock(api.user.get),
       },
       "user-auth": {
         ...api["user-auth"],
@@ -63,6 +64,10 @@ mock.module("./api", () => {
           put: mock(api["user-auth"]["finish-sign-up"].put),
         },
       },
-    } as typeof api,
+      files: {
+        get: mock(api.files.get),
+        post: mock(api.files.post),
+      },
+    },
   };
 });

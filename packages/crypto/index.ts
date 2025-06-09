@@ -6,16 +6,25 @@ export interface FileStream {
   file?: File | Blob;
 }
 
-export interface EncryptedFileStream extends Omit<FileStream, "file" | "stream"> {
-  encryptedFileStream: ReadableStream<Uint8Array>;
-  decryptionHeader: Uint8Array<ArrayBufferLike>;
+export interface EncryptedFileData extends Omit<FileStream, "file" | "stream"> {
+  encryptedFile: File;
+  decryptionHeader: Base64URLString;
+  key: Base64URLString;
 }
 
 export const streamEncryptionChunkSize = 4 * 1024 * 1024;
 
-export { encryptFile, encryptBoxBase64, encryptBoxWithNonceBase64 } from "./src/encrypt";
-export { decryptFile } from "./src/decrypt";
-export { genNewUserKeys, genOTT } from "./src/generate";
+export {
+  encryptFile,
+  encryptBoxBase64,
+  encryptBoxWithNonceBase64,
+  encryptObject,
+  encryptBlobToFile,
+} from "./src/encrypt";
+
+export { decryptFile, decryptBoxBase64, decryptUnit8Array, decryptObject } from "./src/decrypt";
+
+export { genNewUserKeys, genOTT, genFileKeyBase64, deriveKeyBase64 } from "./src/generate";
 export { getHashBase64 } from "./src/hash";
 export { createCryptoWorker } from "./src/util/worker-helper";
 export {
