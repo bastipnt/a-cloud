@@ -18,7 +18,9 @@
     "lint:fix": "tsc --noEmit && eslint --fix .",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck:web": "bun --filter '@acloud/web' typecheck",
+    "typecheck:server": "bun --filter '@acloud/server' typecheck",
+    "typecheck": "bun typecheck:web && bun typecheck:server"
   },
   "workspaces": [
     "packages/*",

@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "target": "ES2021",
-    "module": "ES2022",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "types": ["bun-types"],
     "esModuleInterop": true,
