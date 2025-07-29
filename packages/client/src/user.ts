@@ -98,6 +98,10 @@ export const signUp = async (email: string) => {
   if (res.status !== 200) throw new Error("User could not be created");
 };
 
+export const signOut = async () => {
+  await api.user["sign-out"].post();
+};
+
 export const verifyOTT = async (email: string, ott: string) => {
   const res = await api["user-auth"]["verify-ott"].post({
     email,

@@ -367,13 +367,19 @@ export const userAuthRoutes = new Elysia({ prefix: "/user-auth" })
    */
   .post(
     "/verify-ott",
-    async ({ userAuthController, body: { email, ott }, error, cookie: { tmpSignUpAuth }, jwt }) => {
+    async ({
+      userAuthController,
+      body: { email, ott },
+      status,
+      cookie: { tmpSignUpAuth },
+      jwt,
+    }) => {
       let userId: string;
 
       try {
         userId = await userAuthController.verifyOTT({ email, ott });
       } catch {
-        return error(401, "Unauthorized");
+        return status(401, "Unauthorized");
       }
 
       const value = await jwt.sign({ userId, ott });

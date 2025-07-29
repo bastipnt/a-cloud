@@ -1,5 +1,7 @@
-import { Field, Form, FormikProps, withFormik } from "formik";
+import { Form, FormikProps, withFormik } from "formik";
 import { InferType, object, string } from "yup";
+import Button from "../components/Button";
+import FormField from "../components/FormField";
 
 const signInSchema = object({
   email: string().email().required(),
@@ -22,25 +24,20 @@ const SignInInnerForm: React.FC<FormikProps<SignInFormValues>> = ({
     <Form className="flex w-3xs flex-col gap-4 p-4">
       <div className="flex flex-col">
         <label htmlFor="email">Email</label>
-        <Field
-          className="border p-1"
-          id="email"
-          type="email"
-          name="email"
-          placeholder="annie@mail.org"
-        />
+        <FormField id="email" type="email" name="email" placeholder="annie@mail.org" />
+
         {touched.email && errors.email && <div>{errors.email}</div>}
       </div>
 
       <div className="flex flex-col">
         <label htmlFor="password">Password</label>
-        <Field className="border p-1" id="password" name="password" type="password" />
+        <FormField id="password" name="password" type="password" />
         {touched.password && errors.password && <div>{errors.password}</div>}
       </div>
 
-      <button className="cursor-pointer border p-1" type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
         Submit
-      </button>
+      </Button>
     </Form>
   );
 };

@@ -1,5 +1,7 @@
-import { Field, Form, FormikErrors, FormikProps, withFormik } from "formik";
+import { Form, FormikErrors, FormikProps, withFormik } from "formik";
 import { InferType, object, string } from "yup";
+import Button from "../components/Button";
+import FormField from "../components/FormField";
 
 const finishSignUpSchema = object({
   email: string().email().required(),
@@ -20,21 +22,21 @@ const FinishSignUpInnerForm: React.FC<FormikProps<FinishSignUpFormValues>> = ({
   isSubmitting,
 }) => {
   return (
-    <Form>
+    <Form className="flex w-3xs flex-col gap-4 p-4">
       <label htmlFor="email">Email</label>
-      <Field id="email" type="email" name="email" placeholder="annie@mail.org" disabled />
+      <FormField id="email" type="email" name="email" placeholder="annie@mail.org" disabled />
 
       <label htmlFor="password">Password</label>
-      <Field id="password" name="password" type="password" />
+      <FormField id="password" name="password" type="password" />
       {touched.password && errors.password && <div>{errors.password}</div>}
 
       <label htmlFor="passwordRepeat">Repeat Password</label>
-      <Field id="passwordRepeat" name="passwordRepeat" type="password" />
+      <FormField id="passwordRepeat" name="passwordRepeat" type="password" />
       {touched.passwordRepeat && errors.passwordRepeat && <div>{errors.passwordRepeat}</div>}
 
-      <button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
         Submit
-      </button>
+      </Button>
     </Form>
   );
 };

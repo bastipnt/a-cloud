@@ -9,9 +9,9 @@ export const userService = new Elysia({ name: "user/service" })
     isSignedIn(enabled: boolean) {
       if (!enabled) return;
 
-      onBeforeHandle(async ({ error, jwt, cookie: { auth } }) => {
+      onBeforeHandle(async ({ status, jwt, cookie: { auth } }) => {
         const value = await jwt.verify(auth?.value);
-        if (!value) return error(401, { success: false, message: "Unauthorized" });
+        if (!value) return status(401, { success: false, message: "Unauthorized" });
         return;
       });
     },
@@ -35,4 +35,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
   .use(withUserId)
   .get("/", async ({ userId }) => {
     return { message: "Get user", userId };
+  })
+  .post("/sign-out", ({ cookie: { auth } }) => {
+    auth?.remove();
   });

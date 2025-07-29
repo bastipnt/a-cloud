@@ -3,6 +3,7 @@ export {
   signIn,
   proofSignIn,
   signUp,
+  signOut,
   finishSignUp,
   verifyOTT,
   getUser,

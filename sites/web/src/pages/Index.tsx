@@ -7,7 +7,7 @@ import { useClient } from "../hooks/client";
 
 const Index: React.FC = () => {
   const [userId, setUserId] = useState<string>("No user");
-  const { getUser } = useClient();
+  const { getUser, signOut } = useClient();
   const [_, navigate] = useLocation();
 
   const checkSignedIn = async () => {
@@ -24,6 +24,11 @@ const Index: React.FC = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/sign-in");
+  };
+
   useEffect(() => {
     checkSignedIn();
     window.localStorage.setItem("test", "hello");
@@ -33,6 +38,7 @@ const Index: React.FC = () => {
     <>
       <h1>Index</h1>
       <p>User id: {userId}</p>
+      <button onClick={handleSignOut}>Sign Out</button>
       <FileTable />
       <FileUpload />
     </>
