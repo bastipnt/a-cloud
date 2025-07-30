@@ -1,7 +1,9 @@
 import {
+  getFile as _getFile,
   getFiles as _getFiles,
   finishSignUp,
   getUser,
+  loadImage,
   loadThumbnail,
   proofSignIn,
   signIn,
@@ -21,6 +23,12 @@ export const useClient = () => {
     return _getFiles(mainKey);
   };
 
+  const getFile = async (fileId: string) => {
+    const mainKey = await getMainKeyBase64();
+
+    return _getFile(fileId, mainKey);
+  };
+
   return {
     uploadFiles,
     signIn,
@@ -31,6 +39,8 @@ export const useClient = () => {
     verifyOTT,
     getUser,
     getFiles,
+    getFile,
     loadThumbnail,
+    loadImage,
   };
 };

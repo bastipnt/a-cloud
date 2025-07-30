@@ -13,6 +13,7 @@ export const decryptFile = async (
   fileKey: Base64URLString,
   decryptionHeader: Base64URLString,
   fileName: string,
+  chunkCount: number = 1,
 ): Promise<File> => {
   await sodium.ready;
 
@@ -20,7 +21,7 @@ export const decryptFile = async (
     encryptedFileData,
     fileKey,
     decryptionHeader,
-    encryptedFileData.length,
+    chunkCount === 1 ? encryptedFileData.length : undefined,
   );
 
   if (!fileData) throw new FileDecryptionError();
@@ -62,6 +63,7 @@ export const decryptFileUnit8Array = async (
   const decryptionChunkSize =
     predefinedChunkSize ||
     streamEncryptionChunkSize + sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+
   let bytesRead = 0;
   const decryptedChunks: Uint8Array[] = [];
 

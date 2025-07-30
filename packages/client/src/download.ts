@@ -5,15 +5,6 @@ class FileDownloadError extends Error {
   override name: string = "FileDownloadError";
 }
 
-// export const downloadFile = async (id: string): Promise<Uint8Array | undefined> => {
-//   const res = await api.download.file({ id }).get();
-//   if (res.data === null) return;
-//   const buffer = res.data as unknown as ArrayBuffer;
-
-//   console.log("file:", res);
-//   return new Uint8Array(buffer);
-// };
-
 export type LoadThumbnailParams = {
   fileId: string;
   fileName: string;
@@ -33,4 +24,27 @@ export const loadThumbnail = async ({
   const encryptedFileData = new Uint8Array(res.data as unknown as ArrayBuffer);
 
   return decryptFile(encryptedFileData, fileKey, thumbnailDecryptionHeader, fileName);
+};
+
+export type LoadImageParams = {
+  fileId: string;
+  fileName: string;
+  fileKey: Base64URLString;
+  fileDecryptionHeader: Base64URLString;
+  chunkCount: number;
+};
+
+export const loadImage = async ({
+  fileId,
+  fileName,
+  fileKey,
+  fileDecryptionHeader,
+  chunkCount,
+}: LoadImageParams) => {
+  const res = await api.download({ fileId }).get();
+
+  if (res.status !== 200 || !res.data) throw new FileDownloadError();
+  const encryptedFileData = new Uint8Array(res.data as unknown as ArrayBuffer);
+
+  return decryptFile(encryptedFileData, fileKey, fileDecryptionHeader, fileName, chunkCount);
 };

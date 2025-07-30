@@ -35,6 +35,16 @@ class FileController {
     });
   }
 
+  async getFile(userId: string, fileId: string) {
+    return await db.query.filesTable.findFirst({
+      where: (f, { eq, and }) => and(eq(f.ownerId, userId), eq(f.fileId, fileId)),
+      columns: {
+        ownerId: false,
+        parentId: false,
+      },
+    });
+  }
+
   async saveFile(userId: string, uploadParams: UploadParams) {
     const isDir = !uploadParams.fileDecryptionHeader;
 
@@ -64,6 +74,15 @@ export const fileRoutes = new Elysia({ prefix: "/files" })
 
     return { files };
   })
+  .get(
+    "/:fileId",
+    async ({ params: { fileId }, fileController, userId }) => {
+      const file = await fileController.getFile(userId, fileId);
+
+      return { file };
+    },
+    { params: "fileParams" },
+  )
   .post(
     "/",
     async ({ body, fileController, userId }) => {

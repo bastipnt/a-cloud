@@ -26,7 +26,7 @@ export const downloadRoutes = new Elysia({ prefix: "/download" })
   .get(
     "/:fileId",
     async ({ params: { fileId }, downloadController, userId }) => {
-      downloadController.getFile(userId, fileId, false);
+      return downloadController.getFile(userId, fileId, false);
     },
     {
       params: "downloadFileParams",

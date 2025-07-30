@@ -1,6 +1,7 @@
 import { NotLoggedInError } from "@acloud/client/src/user";
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
+import Button from "../components/Button";
 import FileTable from "../components/FileTable";
 import FileUpload from "../components/FileUpload";
 import { useClient } from "../hooks/client";
@@ -8,7 +9,10 @@ import { useClient } from "../hooks/client";
 const Index: React.FC = () => {
   const [userId, setUserId] = useState<string>("No user");
   const { getUser, signOut } = useClient();
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+
+  const [matchImage] = useRoute("/image/:id");
+  const [matchRoot] = useRoute("/");
 
   const checkSignedIn = async () => {
     try {
@@ -31,17 +35,25 @@ const Index: React.FC = () => {
 
   useEffect(() => {
     checkSignedIn();
-    window.localStorage.setItem("test", "hello");
   }, []);
 
+  useEffect(() => {
+    if (!matchRoot && !matchImage) navigate("/");
+  }, [matchImage, matchRoot]);
+
   return (
-    <>
-      <h1>Index</h1>
-      <p>User id: {userId}</p>
-      <button onClick={handleSignOut}>Sign Out</button>
+    <section className="flex flex-col gap-8 p-8">
+      <div>
+        <h1>User id: {userId}</h1>
+        <p>{location}</p>
+      </div>
+
+      <Button onClick={handleSignOut}>Sign Out</Button>
+
       <FileTable />
+
       <FileUpload />
-    </>
+    </section>
   );
 };
 

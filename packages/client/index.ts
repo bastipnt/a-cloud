@@ -1,4 +1,4 @@
-export { loadThumbnail, type LoadThumbnailParams } from "./src/download";
+export { loadThumbnail, loadImage, type LoadThumbnailParams } from "./src/download";
 export {
   signIn,
   proofSignIn,
@@ -11,4 +11,4 @@ export {
 } from "./src/user";
 
 export { uploadFiles } from "./src/upload";
-export { getFiles, FilesLoadingError } from "./src/file";
+export { getFiles, getFile, FilesLoadingError } from "./src/file";

@@ -6,6 +6,10 @@ export class FilesLoadingError extends Error {
   override message = "FilesLoadingError";
 }
 
+export class FileLoadingError extends Error {
+  override message = "FileLoadingError";
+}
+
 class NotAFileError extends Error {
   override message = "NotAFileError";
 }
@@ -53,4 +57,14 @@ export const getFiles = async (mainKey: Base64URLString): Promise<FileData[]> =>
   const files = res.data.files;
 
   return Promise.all(files.map((f) => getFileData(f, mainKey)));
+};
+
+export const getFile = async (fileId: string, mainKey: Base64URLString): Promise<FileData> => {
+  const res = await api.files({ fileId }).get();
+
+  if (!res.data || !res.data.file) throw new FileLoadingError();
+
+  const file = res.data.file;
+
+  return getFileData(file, mainKey);
 };

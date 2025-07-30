@@ -1,5 +1,6 @@
 import { FileData } from "@acloud/media";
 import { useEffect, useRef } from "react";
+import { Link } from "wouter";
 import { useClient } from "../hooks/client";
 
 const Thumbnail: React.FC<FileData> = ({
@@ -27,7 +28,19 @@ const Thumbnail: React.FC<FileData> = ({
     });
   }, []);
 
-  return <img src={undefined} alt={`thumbnail of ${metadata.fileName}`} ref={imgRef} />;
+  return (
+    <Link
+      className="relative block overflow-hidden rounded-lg after:block after:pb-[100%] after:content-['']"
+      to={`/image/${fileId}`}
+    >
+      <img
+        className="absolute h-full w-full object-cover"
+        src={undefined}
+        alt={`thumbnail of ${metadata.fileName}`}
+        ref={imgRef}
+      />
+    </Link>
+  );
 };
 
 export default Thumbnail;

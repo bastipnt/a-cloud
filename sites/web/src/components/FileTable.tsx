@@ -24,12 +24,11 @@ const FileTable: React.FC = () => {
 
   return (
     <section>
-      <div>Header</div>
-      <ul className="grid grid-cols-5 gap-16">
+      <ul className="grid grid-cols-3 gap-4">
         {files.map((fileData) => (
           <li key={fileData.fileId}>
             <Thumbnail {...fileData} />
-            <p>{fileData.metadata.fileName}</p>
+            {/* <p>{fileData.metadata.fileName}</p> */}
           </li>
         ))}
       </ul>
