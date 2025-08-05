@@ -23,8 +23,9 @@ function App() {
 
           <Route path="/" nest>
             <UserProvider>
+              <Header />
+
               <FilesProvider>
-                <Header />
                 <Index />
                 <Route path="/image/:id" component={ImagePreview} />
               </FilesProvider>

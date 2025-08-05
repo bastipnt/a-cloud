@@ -1,7 +1,8 @@
 import { FileData } from "@acloud/media";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useClient } from "../hooks/client";
+import { FilesContext } from "../providers/FilesProvider";
 
 const Thumbnail: React.FC<FileData> = ({
   fileId,
@@ -11,20 +12,30 @@ const Thumbnail: React.FC<FileData> = ({
 }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const { loadThumbnail } = useClient();
+  const { addThumbnail, getThumbnail } = useContext(FilesContext);
+
+  const setImgSrc = (thumbnail: File) => {
+    if (!imgRef.current) return;
+    const imgUrl = URL.createObjectURL(thumbnail);
+
+    imgRef.current.src = imgUrl;
+  };
 
   useEffect(() => {
     if (!thumbnailDecryptionHeader) return;
+
+    const thumbnail = getThumbnail(fileId);
+
+    if (thumbnail) return setImgSrc(thumbnail.file);
 
     loadThumbnail({
       fileId,
       fileName: metadata.fileName,
       fileKey,
       thumbnailDecryptionHeader,
-    }).then((thumbnail) => {
-      if (!imgRef.current) return;
-      const imgUrl = URL.createObjectURL(thumbnail);
-
-      imgRef.current.src = imgUrl;
+    }).then((thumbnailFile) => {
+      setImgSrc(thumbnailFile);
+      addThumbnail({ fileId, file: thumbnailFile });
     });
   }, []);
 

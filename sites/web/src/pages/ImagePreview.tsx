@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useRoute } from "wouter";
 import Spinner from "../components/svg/Spinner";
 import { useClient } from "../hooks/client";
+import { FilesContext } from "../providers/FilesProvider";
 import { ScrollBehaviorContext } from "../providers/ScrollBehaviorProvider";
 
 const ImagePreview: React.FC = () => {
@@ -11,10 +12,23 @@ const ImagePreview: React.FC = () => {
   const [metadata, setMetadata] = useState<FileData["metadata"]>();
   const [matchImage, params] = useRoute("/image/:fileId");
   const { setPageScroll } = useContext(ScrollBehaviorContext);
+  const { getThumbnail, nextFileId, prevFileId } = useContext(FilesContext);
 
   const { getFile, loadImage } = useClient();
 
+  const setImgSrc = (imgFile: File) => {
+    if (!imgRef.current) return;
+    const imgUrl = URL.createObjectURL(imgFile);
+
+    imgRef.current.src = imgUrl;
+  };
+
   const load = async (fileId: string) => {
+    setLoading(true);
+    const thumbnail = getThumbnail(fileId);
+
+    if (thumbnail) setImgSrc(thumbnail.file);
+
     const fileData = await getFile(fileId);
     if (!fileData.fileDecryptionHeader) return;
 
@@ -28,10 +42,7 @@ const ImagePreview: React.FC = () => {
       chunkCount: fileData.metadata.chunkCount,
     });
 
-    if (!imgRef.current) return;
-    const imgUrl = URL.createObjectURL(image);
-
-    imgRef.current.src = imgUrl;
+    setImgSrc(image);
 
     setLoading(false);
   };
@@ -50,9 +61,17 @@ const ImagePreview: React.FC = () => {
 
   return (
     <section className="fixed top-0 left-0 h-full w-full bg-white p-4 dark:bg-gray-900">
-      <Link className="absolute cursor-pointer" to="/">
-        Back
-      </Link>
+      <div className="absolute flex flex-row gap-8">
+        <Link className="cursor-pointer" to="/">
+          Back
+        </Link>
+        <Link className="cursor-pointer" to={`/image/${prevFileId(params!.fileId)}`}>
+          Prev
+        </Link>
+        <Link className="cursor-pointer" to={`/image/${nextFileId(params!.fileId)}`}>
+          Next
+        </Link>
+      </div>
       {loading && <Spinner className="fixed top-4 right-4" />}
       <img
         className="h-full w-full object-contain text-center leading-[100vh]"
