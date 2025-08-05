@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import FileUploadForm from "../forms/FileUploadForm";
 import { useClient } from "../hooks/client";
 import { useStorage } from "../hooks/storage";
-import { FilesContext } from "../providers/filesProvider";
+import { FilesContext } from "../providers/FilesProvider";
 
 const FileUpload: React.FC = () => {
   const { addFiles } = useContext(FilesContext);

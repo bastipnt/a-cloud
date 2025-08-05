@@ -1,10 +1,14 @@
 import { FilesLoadingError } from "@acloud/client";
 import { useContext, useEffect } from "react";
 import { useClient } from "../hooks/client";
-import { FilesContext } from "../providers/filesProvider";
+import { FilesContext } from "../providers/FilesProvider";
 import Thumbnail from "./Thumbnail";
 
-const FileTable: React.FC = () => {
+type FileTableProps = {
+  className?: string;
+};
+
+const FileTable: React.FC<FileTableProps> = ({ className }) => {
   const { files, setFiles } = useContext(FilesContext);
   const { getFiles } = useClient();
 
@@ -23,7 +27,7 @@ const FileTable: React.FC = () => {
   }, []);
 
   return (
-    <section>
+    <section className={className}>
       <ul className="grid grid-cols-3 gap-4">
         {files.map((fileData) => (
           <li key={fileData.fileId}>

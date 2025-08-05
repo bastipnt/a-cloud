@@ -1,5 +1,5 @@
-import "./App.css";
 import { Route, Switch } from "wouter";
+import Header from "./Header";
 import Layout from "./Layout";
 import FinishSignUp from "./pages/FinishSignUp";
 import ImagePreview from "./pages/ImagePreview";
@@ -7,11 +7,13 @@ import Index from "./pages/Index";
 import OTT from "./pages/OTT";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import Provider from "./providers";
+import FilesProvider from "./providers/FilesProvider";
+import ScrollBehaviorProvider from "./providers/ScrollBehaviorProvider";
+import UserProvider from "./providers/UserProvider";
 
 function App() {
   return (
-    <Provider>
+    <ScrollBehaviorProvider>
       <Layout>
         <Switch>
           <Route path="/sign-up" component={SignUp} />
@@ -20,12 +22,17 @@ function App() {
           <Route path="/sign-in" component={SignIn} />
 
           <Route path="/" nest>
-            <Index />
-            <Route path="/image/:id" component={ImagePreview} />
+            <UserProvider>
+              <FilesProvider>
+                <Header />
+                <Index />
+                <Route path="/image/:id" component={ImagePreview} />
+              </FilesProvider>
+            </UserProvider>
           </Route>
         </Switch>
       </Layout>
-    </Provider>
+    </ScrollBehaviorProvider>
   );
 }
 

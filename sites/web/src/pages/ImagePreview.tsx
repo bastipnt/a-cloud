@@ -1,14 +1,16 @@
 import { FileData } from "@acloud/media";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useRoute } from "wouter";
 import Spinner from "../components/svg/Spinner";
 import { useClient } from "../hooks/client";
+import { ScrollBehaviorContext } from "../providers/ScrollBehaviorProvider";
 
 const ImagePreview: React.FC = () => {
   const imgRef = useRef<HTMLImageElement>(null);
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState<FileData["metadata"]>();
   const [matchImage, params] = useRoute("/image/:fileId");
+  const { setPageScroll } = useContext(ScrollBehaviorContext);
 
   const { getFile, loadImage } = useClient();
 
@@ -40,8 +42,14 @@ const ImagePreview: React.FC = () => {
     load(params.fileId);
   }, [matchImage, params?.fileId]);
 
+  useEffect(() => {
+    setPageScroll(false);
+
+    return () => setPageScroll(true);
+  }, []);
+
   return (
-    <section className="fixed top-0 left-0 h-full w-full bg-white p-4">
+    <section className="fixed top-0 left-0 h-full w-full bg-white p-4 dark:bg-gray-900">
       <Link className="absolute cursor-pointer" to="/">
         Back
       </Link>
