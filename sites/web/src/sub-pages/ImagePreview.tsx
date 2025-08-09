@@ -1,10 +1,11 @@
 import { FileData } from "@acloud/media";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Link, useRoute } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 import Spinner from "../components/svg/Spinner";
 import { useClient } from "../hooks/client";
 import { useModalScroll } from "../hooks/modalScroll";
 import { FilesContext } from "../providers/FilesProvider";
+import { KeyboardContext } from "../providers/KeyboardProvider";
 
 const ImagePreview: React.FC = () => {
   useModalScroll();
@@ -13,7 +14,9 @@ const ImagePreview: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState<FileData["metadata"]>();
   const [matchImage, params] = useRoute("/image/:fileId");
+  const [_, navigate] = useLocation();
   const { getThumbnail, nextFileId, prevFileId } = useContext(FilesContext);
+  const { keyPressed } = useContext(KeyboardContext);
 
   const { getFile, loadImage } = useClient();
 
@@ -44,7 +47,6 @@ const ImagePreview: React.FC = () => {
     });
 
     setImgSrc(image);
-
     setLoading(false);
   };
 
@@ -53,6 +55,12 @@ const ImagePreview: React.FC = () => {
 
     load(params.fileId);
   }, [matchImage, params?.fileId, getFile]);
+
+  useEffect(() => {
+    if (keyPressed("ArrowRight")) navigate(`/image/${nextFileId(params!.fileId)}`);
+    else if (keyPressed("ArrowLeft")) navigate(`/image/${prevFileId(params!.fileId)}`);
+    else if (keyPressed("Escape")) navigate("/");
+  }, [keyPressed, nextFileId, prevFileId]);
 
   return (
     <section className="fixed top-0 left-0 h-full w-full bg-white p-4 dark:bg-gray-900">
