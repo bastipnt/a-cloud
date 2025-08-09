@@ -24,11 +24,11 @@ const FileTable: React.FC<FileTableProps> = ({ className }) => {
 
         throw error;
       });
-  }, []);
+  }, [getFiles]);
 
   return (
     <section className={className}>
-      <ul className="grid grid-cols-3 gap-4">
+      <ul className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
         {files.map((fileData) => (
           <li key={fileData.fileId}>
             <Thumbnail {...fileData} />

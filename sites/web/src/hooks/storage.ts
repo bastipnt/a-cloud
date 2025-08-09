@@ -24,9 +24,12 @@ export const useStorage = () => {
     sessionStorage.setItem("keyEncryptionKey", keyEncryptionKey);
   };
 
-  const getMainKeyBase64 = async () => {
+  const getKeyEncryptionKey = () => {
+    return sessionStorage.getItem("keyEncryptionKey");
+  };
+
+  const getMainKeyBase64 = async (keyEncryptionKey: Base64URLString) => {
     const rawKeyParams = localStorage.getItem("keyParams");
-    const keyEncryptionKey = sessionStorage.getItem("keyEncryptionKey");
 
     // TODO: likely means user is not logged in correctly -> sign out
     if (!rawKeyParams || !keyEncryptionKey) throw new MainKeyRetrievalError();
@@ -36,5 +39,12 @@ export const useStorage = () => {
     return decryptBoxBase64(keyParams.encryptedMainKey, keyParams.mainKeyNonce, keyEncryptionKey);
   };
 
-  return { storeEmail, getEmail, storeKeyParams, storeKeyEncryptionKey, getMainKeyBase64 };
+  return {
+    storeEmail,
+    getEmail,
+    storeKeyParams,
+    storeKeyEncryptionKey,
+    getKeyEncryptionKey,
+    getMainKeyBase64,
+  };
 };

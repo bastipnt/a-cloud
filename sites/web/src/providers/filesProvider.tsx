@@ -55,11 +55,7 @@ const FilesProvider: React.FC<FilesProviderProps> = ({ children }) => {
 
   const prevNextFileId = useCallback(
     (currentFileId: string, indexModifier: number) => {
-      console.log(currentFileId);
-
       const index = files.findIndex((file) => file.fileId === currentFileId);
-
-      console.log(index);
 
       if (index === -1) return undefined;
       if (index === files.length - 1 && indexModifier === 1) return files[index].fileId;

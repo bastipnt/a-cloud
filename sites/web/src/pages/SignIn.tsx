@@ -1,14 +1,16 @@
 import { SignInError } from "@acloud/client";
 import { NotLoggedInError } from "@acloud/client/src/user";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import SignInForm, { SignInFormValues } from "../forms/SignInForm";
 import { useClient } from "../hooks/client";
 import { useCrypto } from "../hooks/crypto";
 import { useStorage } from "../hooks/storage";
+import { KeysContext } from "../providers/KeysProvider";
 
 const SignIn: React.FC = () => {
-  const { getEmail, storeKeyEncryptionKey, storeKeyParams } = useStorage();
+  const { setNewKeyEncryptionKey } = useContext(KeysContext);
+  const { getEmail, storeKeyParams } = useStorage();
   const { signIn, proofSignIn, getUser } = useClient();
   const { deriveKeyBase64 } = useCrypto();
   const [_, navigate] = useLocation();
@@ -43,7 +45,9 @@ const SignIn: React.FC = () => {
       keyParams.opsLimit,
       keyParams.memLimit,
     );
-    storeKeyEncryptionKey(keyEncryptionKey);
+
+    setNewKeyEncryptionKey(keyEncryptionKey);
+    // storeKeyEncryptionKey(keyEncryptionKey);
 
     navigate("/");
   };

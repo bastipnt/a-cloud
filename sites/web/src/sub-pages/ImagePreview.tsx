@@ -30,7 +30,7 @@ const ImagePreview: React.FC = () => {
     if (thumbnail) setImgSrc(thumbnail.file);
 
     const fileData = await getFile(fileId);
-    if (!fileData.fileDecryptionHeader) return;
+    if (fileData === null || !fileData.fileDecryptionHeader) return;
 
     setMetadata(fileData.metadata);
 
@@ -51,7 +51,7 @@ const ImagePreview: React.FC = () => {
     if (!matchImage || !params.fileId) return;
 
     load(params.fileId);
-  }, [matchImage, params?.fileId]);
+  }, [matchImage, params?.fileId, getFile]);
 
   useEffect(() => {
     setPageScroll(false);
