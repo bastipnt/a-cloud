@@ -28,6 +28,7 @@ class FileController {
   async getFiles(userId: string) {
     return await db.query.filesTable.findMany({
       where: (f, { eq }) => eq(f.ownerId, userId),
+      orderBy: (f, { desc }) => desc(f.createdAt),
       columns: {
         ownerId: false,
         parentId: false,

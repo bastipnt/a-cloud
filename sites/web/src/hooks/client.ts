@@ -1,6 +1,7 @@
 import {
   getFile as _getFile,
   getFiles as _getFiles,
+  uploadFiles as _uploadFiles,
   finishSignUp,
   getUser,
   loadImage,
@@ -9,7 +10,6 @@ import {
   signIn,
   signOut,
   signUp,
-  uploadFiles,
   verifyOTT,
 } from "@acloud/client";
 import { FileData } from "@acloud/media";
@@ -41,6 +41,14 @@ export const useClient = () => {
     async (fileId: string): Promise<FileData | null> => {
       if (!mainKey) return null;
       return _getFile(fileId, mainKey);
+    },
+    [mainKey],
+  );
+
+  const uploadFiles = useCallback(
+    async (files: File[]): Promise<FileData[] | null> => {
+      if (!mainKey) return null;
+      return await _uploadFiles(files, mainKey);
     },
     [mainKey],
   );

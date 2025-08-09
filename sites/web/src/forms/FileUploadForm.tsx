@@ -20,6 +20,7 @@ const FileUploadInnerForm: React.FC<FormikProps<FileUploadFormValues>> = ({
   errors,
   isSubmitting,
   setFieldValue,
+  setFieldTouched,
 }) => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -29,7 +30,8 @@ const FileUploadInnerForm: React.FC<FormikProps<FileUploadFormValues>> = ({
         newFiles.push(file);
       }
 
-      setFieldValue("files", newFiles);
+      setFieldValue("files", newFiles, true);
+      setFieldTouched("files", true);
     }
   };
 
@@ -43,7 +45,11 @@ const FileUploadInnerForm: React.FC<FormikProps<FileUploadFormValues>> = ({
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
+      <Button
+        type="submit"
+        disabled={isSubmitting || !touched.files || !!errors.files}
+        loading={isSubmitting}
+      >
         Upload
       </Button>
     </Form>

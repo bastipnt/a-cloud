@@ -11,6 +11,7 @@ import KeysProvider from "./providers/KeysProvider";
 import ScrollBehaviorProvider from "./providers/ScrollBehaviorProvider";
 import UserProvider from "./providers/UserProvider";
 import ImagePreview from "./sub-pages/ImagePreview";
+import Uploader from "./sub-pages/Uploader";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                 <FilesProvider>
                   <Index />
                   <Route path="/image/:id" component={ImagePreview} />
+                  <Route path="/uploader" component={Uploader} />
                 </FilesProvider>
               </UserProvider>
             </Route>

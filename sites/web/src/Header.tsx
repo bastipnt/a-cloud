@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import Button from "./components/Button";
 import { useClient } from "./hooks/client";
 import { UserContext } from "./providers/UserProvider";
@@ -18,6 +18,7 @@ const Header: React.FC = () => {
     <header className="flex flex-row items-center justify-between gap-4">
       <p>Current User Id: {user}</p>
       <Button onClick={handleSignOut}>Sign Out</Button>
+      <Link to="/uploader">Upload Files</Link>
     </header>
   );
 };
