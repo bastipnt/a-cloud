@@ -1,4 +1,9 @@
-export { loadThumbnail, loadImage, type LoadThumbnailParams } from "./src/download";
+export {
+  loadThumbnail,
+  loadImage,
+  loadFileToUnit8Array,
+  type LoadThumbnailParams,
+} from "./src/download";
 export {
   signIn,
   proofSignIn,

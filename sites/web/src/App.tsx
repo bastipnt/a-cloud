@@ -12,7 +12,9 @@ import KeysProvider from "./providers/KeysProvider";
 import ScrollBehaviorProvider from "./providers/ScrollBehaviorProvider";
 import UserProvider from "./providers/UserProvider";
 import ImagePreview from "./sub-pages/ImagePreview";
+import PDFPreview from "./sub-pages/PDFPreview";
 import Uploader from "./sub-pages/Uploader";
+import { IMAGE_SLUG, PDF_SLUG } from "./utils/urlHelper";
 
 function App() {
   return (
@@ -32,7 +34,8 @@ function App() {
 
                   <FilesProvider>
                     <Index />
-                    <Route path="/image/:id" component={ImagePreview} />
+                    <Route path={`/${IMAGE_SLUG}/:id`} component={ImagePreview} />
+                    <Route path={`/${PDF_SLUG}/:id`} component={PDFPreview} />
                     <Route path="/uploader" component={Uploader} />
                   </FilesProvider>
                 </UserProvider>

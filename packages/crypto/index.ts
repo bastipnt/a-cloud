@@ -22,7 +22,13 @@ export {
   encryptBlobToFile,
 } from "./src/encrypt";
 
-export { decryptFile, decryptBoxBase64, decryptUnit8Array, decryptObject } from "./src/decrypt";
+export {
+  decryptFile,
+  decryptFileToUnit8Array,
+  decryptBoxBase64,
+  decryptUnit8Array,
+  decryptObject,
+} from "./src/decrypt";
 
 export { genNewUserKeys, genOTT, genFileKeyBase64, deriveKeyBase64 } from "./src/generate";
 export { getHashBase64 } from "./src/hash";

@@ -4,6 +4,7 @@ import {
   uploadFiles as _uploadFiles,
   finishSignUp,
   getUser,
+  loadFileToUnit8Array,
   loadImage,
   loadThumbnail,
   proofSignIn,
@@ -66,5 +67,6 @@ export const useClient = () => {
     getFile,
     loadThumbnail,
     loadImage,
+    loadFileToUnit8Array,
   };
 };

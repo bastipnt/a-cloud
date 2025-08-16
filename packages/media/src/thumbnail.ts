@@ -1,3 +1,8 @@
+import * as pdfjsLib from "pdfjs-dist";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
 const MAX_THUMBNAIL_DIMENSION = 720;
 const MAX_THUMBNAIL_SIZE = 100 * 1024; // 100 KB
 
@@ -79,6 +84,34 @@ export const generateImageThumbnailCanvas = async (image: File) => {
       }
     };
   });
+
+  return await canvasToCompressedJPEG(canvas, MAX_THUMBNAIL_SIZE);
+};
+
+export const generatePDFThumbnail = async (pdfFile: File) => {
+  const canvas = document.createElement("canvas");
+  const canvasCtx = canvas.getContext("2d")!;
+
+  const arrayBuffer = await pdfFile.arrayBuffer();
+  const pdfData = new Uint8Array(arrayBuffer);
+
+  const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+
+  const pdfDocument = await loadingTask.promise;
+  // Request a first page
+  const pdfPage = await pdfDocument.getPage(1);
+  // Display page on the existing canvas with 100% scale.
+  const viewport = pdfPage.getViewport({ scale: 1.0 });
+
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  const renderTask = pdfPage.render({
+    canvasContext: canvasCtx,
+    viewport,
+    canvas,
+  });
+  await renderTask.promise;
 
   return await canvasToCompressedJPEG(canvas, MAX_THUMBNAIL_SIZE);
 };

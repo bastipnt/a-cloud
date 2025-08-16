@@ -17,8 +17,8 @@ type FilesContextType = {
   addThumbnail: (thumbnail: Thumbnail) => void;
   getThumbnail: (fileId: string) => Thumbnail | undefined;
 
-  nextFileId: (currentFileId: string) => string | undefined;
-  prevFileId: (currentFileId: string) => string | undefined;
+  nextFileId: (currentFileId: string) => string;
+  prevFileId: (currentFileId: string) => string;
 };
 
 export const FilesContext = createContext<FilesContextType>({
@@ -31,8 +31,8 @@ export const FilesContext = createContext<FilesContextType>({
   addThumbnail: () => {},
   getThumbnail: () => undefined,
 
-  nextFileId: () => undefined,
-  prevFileId: () => undefined,
+  nextFileId: (currentFileId: string) => currentFileId,
+  prevFileId: (currentFileId: string) => currentFileId,
 });
 
 type FilesProviderProps = {
@@ -57,7 +57,7 @@ const FilesProvider: React.FC<FilesProviderProps> = ({ children }) => {
     (currentFileId: string, indexModifier: number) => {
       const index = files.findIndex((file) => file.fileId === currentFileId);
 
-      if (index === -1) return undefined;
+      if (index === -1) return currentFileId;
       if (index === files.length - 1 && indexModifier === 1) return files[index].fileId;
       if (index === 0 && indexModifier === -1) return files[index].fileId;
 

@@ -1,4 +1,5 @@
 import type { FileType } from "@acloud/db";
+import type { FileTypeResult } from "file-type";
 
 export type EncryptedFileData = Omit<FileType, "ownerId" | "parentId">;
 
@@ -7,6 +8,7 @@ export type FileMetadata = {
   chunkCount: number;
   fileSize: number;
   lastModifiedMs: number;
+  fileType?: FileTypeResult;
 };
 
 export type FileData = {

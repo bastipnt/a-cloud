@@ -10,6 +10,7 @@ import { useScroll } from "../hooks/useMouse";
 import { FilesContext } from "../providers/FilesProvider";
 import { KeyboardContext } from "../providers/KeyboardProvider";
 import { clamp } from "../utils/numberUtils";
+import { getImagePreviewUrl, IMAGE_SLUG } from "../utils/urlHelper";
 
 const MAX_ZOOM = 6 as const;
 const MIN_ZOOM = 1 as const;
@@ -30,7 +31,7 @@ const ImagePreview: React.FC = () => {
   const [metadata, setMetadata] = useState<FileData["metadata"]>();
   const [imgDimensions, setImgDimensions] = useState<ImgDimensions>({ tx: 0, ty: 0, scale: 1 });
 
-  const [matchImage, params] = useRoute("/image/:fileId");
+  const [matchImage, params] = useRoute(`/${IMAGE_SLUG}/:fileId`);
   const [_, navigate] = useLocation();
   const { getThumbnail, nextFileId, prevFileId } = useContext(FilesContext);
   const { keyPressed } = useContext(KeyboardContext);
@@ -127,8 +128,9 @@ const ImagePreview: React.FC = () => {
   };
 
   useEffect(() => {
-    if (keyPressed("ArrowRight")) customNavigate(`/image/${nextFileId(params!.fileId)}`);
-    else if (keyPressed("ArrowLeft")) customNavigate(`/image/${prevFileId(params!.fileId)}`);
+    if (keyPressed("ArrowRight")) customNavigate(`/${IMAGE_SLUG}/${nextFileId(params!.fileId)}`);
+    else if (keyPressed("ArrowLeft"))
+      customNavigate(`/${IMAGE_SLUG}/${prevFileId(params!.fileId)}`);
     else if (keyPressed("Escape")) customNavigate("/");
     else if (keyPressed("+")) zoomIn();
     else if (keyPressed("-")) zoomOut();
@@ -175,10 +177,10 @@ const ImagePreview: React.FC = () => {
         <Close />
       </Link>
       <div className="absolute bottom-4 z-10 flex flex-row gap-8 rounded-sm bg-gray-500 px-4 py-2">
-        <Link className="cursor-pointer" to={`/image/${prevFileId(params!.fileId)}`}>
+        <Link className="cursor-pointer" to={getImagePreviewUrl(prevFileId(params!.fileId))}>
           Prev
         </Link>
-        <Link className="cursor-pointer" to={`/image/${nextFileId(params!.fileId)}`}>
+        <Link className="cursor-pointer" to={getImagePreviewUrl(nextFileId(params!.fileId))}>
           Next
         </Link>
       </div>

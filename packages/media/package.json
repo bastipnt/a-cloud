@@ -11,10 +11,13 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "elysia": "^1.2.25",
-    "@acloud/crypto": "workspace:*",
     "@acloud/common": "workspace:*",
+    "@acloud/crypto": "workspace:*",
+    "@acloud/db": "workspace:*",
     "@acloud/server": "workspace:*",
-    "@acloud/db": "workspace:*"
+    "@types/pdfjs-dist": "^2.10.378",
+    "elysia": "^1.2.25",
+    "file-type": "^21.0.0",
+    "pdfjs-dist": "^5.4.54"
   }
 }

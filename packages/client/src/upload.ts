@@ -2,6 +2,7 @@ import { createCryptoWorker, encryptObject, genFileKeyBase64 } from "@acloud/cry
 import {
   detectFileType,
   generateImageThumbnailCanvas,
+  generatePDFThumbnail,
   type FileData,
   type FileMetadata,
 } from "@acloud/media";
@@ -28,8 +29,16 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
   let encryptedThumbnail: File | undefined;
   let thumbnailDecryptionHeader: Base64URLString | undefined;
 
-  if (fileType.startsWith("image/")) {
+  if (fileType?.mime.startsWith("image/")) {
     const thumbnail = await generateImageThumbnailCanvas(file);
+    [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
+      thumbnail,
+      fileKey,
+    );
+  }
+
+  if (fileType?.mime === "application/pdf") {
+    const thumbnail = await generatePDFThumbnail(file);
     [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
       thumbnail,
       fileKey,
@@ -44,6 +53,7 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
     chunkCount: fileParams.chunkCount,
     fileSize: fileParams.fileSize,
     lastModifiedMs: fileParams.lastModifiedMs,
+    fileType,
   };
 
   const [encryptedMetadata, metadataDecryptionHeader] = await encryptObject(metadata, fileKey);

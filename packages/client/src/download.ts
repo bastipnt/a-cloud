@@ -1,4 +1,4 @@
-import { decryptFile } from "@acloud/crypto";
+import { decryptFile, decryptFileToUnit8Array } from "@acloud/crypto";
 import { api } from "../api";
 
 class FileDownloadError extends Error {
@@ -47,4 +47,25 @@ export const loadImage = async ({
   const encryptedFileData = new Uint8Array(res.data as unknown as ArrayBuffer);
 
   return decryptFile(encryptedFileData, fileKey, fileDecryptionHeader, fileName, chunkCount);
+};
+
+export const loadFileToUnit8Array = async ({
+  fileId,
+  fileName,
+  fileKey,
+  fileDecryptionHeader,
+  chunkCount,
+}: LoadImageParams) => {
+  const res = await api.download({ fileId }).get();
+
+  if (res.status !== 200 || !res.data) throw new FileDownloadError();
+  const encryptedFileData = new Uint8Array(res.data as unknown as ArrayBuffer);
+
+  return decryptFileToUnit8Array(
+    encryptedFileData,
+    fileKey,
+    fileDecryptionHeader,
+    fileName,
+    chunkCount,
+  );
 };

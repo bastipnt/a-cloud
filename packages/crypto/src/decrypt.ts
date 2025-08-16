@@ -8,13 +8,13 @@ class FileDecryptionError extends Error {
   override name: string = "FileDecryptionError";
 }
 
-export const decryptFile = async (
+export const decryptFileToUnit8Array = async (
   encryptedFileData: Uint8Array,
   fileKey: Base64URLString,
   decryptionHeader: Base64URLString,
   fileName: string,
   chunkCount: number = 1,
-): Promise<File> => {
+): Promise<Uint8Array> => {
   await sodium.ready;
 
   const fileData = await decryptFileUnit8Array(
@@ -26,8 +26,26 @@ export const decryptFile = async (
 
   if (!fileData) throw new FileDecryptionError();
 
-  return unit8ArrayToFile(fileData, fileName);
+  return fileData;
 };
+
+export const decryptFile = async (
+  encryptedFileData: Uint8Array,
+  fileKey: Base64URLString,
+  decryptionHeader: Base64URLString,
+  fileName: string,
+  chunkCount: number = 1,
+): Promise<File> =>
+  unit8ArrayToFile(
+    await decryptFileToUnit8Array(
+      encryptedFileData,
+      fileKey,
+      decryptionHeader,
+      fileName,
+      chunkCount,
+    ),
+    fileName,
+  );
 
 export const decryptUnit8Array = async (
   encryptedFileData: Uint8Array,
