@@ -46,9 +46,11 @@
     "bun-types": "^1.2.21",
     "elysia": "^1.3.20",
     "happy-dom": "^17.6.3",
+    "oxlint": "^1.14.0",
     "tough-cookie": "^5.1.2",
     "typescript": "~5.7.3",
     "vite": "^6.3.5",
+    "vite-plugin-oxlint": "^1.4.0",
     "vitest": "^3.2.4"
   }
 }

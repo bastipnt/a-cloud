@@ -14,8 +14,8 @@
     "gen:test-config": "bun --filter '@acloud/config' gen:test-config",
     "gen:migrations": "bun --filter '@acloud/db' gen:migrations",
     "dev:reset-db": "bun --filter '@acloud/db' dev:reset-db",
-    "lint": "tsc --noEmit && eslint .",
-    "lint:fix": "tsc --noEmit && eslint --fix .",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix --fix-suggestions",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "typecheck:web": "bun --filter '@acloud/web' typecheck",
@@ -27,21 +27,20 @@
     "sites/*"
   ],
   "devDependencies": {
-    "@eslint/css": "^0.8.1",
-    "@eslint/js": "^9.33.0",
-    "@eslint/json": "^0.12.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.6.2",
+    "@prettier/plugin-oxc": "^0.0.4",
     "@types/bun": "latest",
     "concurrently": "^9.2.0",
-    "eslint": "^9.33.0",
-    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-react-perf": "^3.3.3",
     "globals": "^16.3.0",
+    "oxlint": "^1.14.0",
+    "oxlint-tsgolint": "^0.1.5",
     "prettier": "3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "typescript-eslint": "^8.39.1"
+    "prettier-plugin-organize-imports": "^4.2.0",
+    "prettier-plugin-tailwindcss": "^0.6.14"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"

@@ -9,7 +9,7 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
 
   let thumbnailEl: React.ReactNode;
 
-  if (!!fileData.thumbnailDecryptionHeader) thumbnailEl = <ThumbnailImage {...fileData} />;
+  if (fileData.thumbnailDecryptionHeader) thumbnailEl = <ThumbnailImage {...fileData} />;
   else if (metadata.fileType.mime.startsWith("text")) thumbnailEl = <ThumbnailText {...fileData} />;
   else
     thumbnailEl = (
