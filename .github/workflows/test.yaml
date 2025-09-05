@@ -55,7 +55,7 @@ jobs:
         run: bun run gen:test-users
 
       - name: Check formatting
-        run: bun run check
+        run: bun run typecheck
 
       - name: Lint
         run: bun run lint
