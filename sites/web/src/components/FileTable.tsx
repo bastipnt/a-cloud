@@ -1,5 +1,6 @@
 import { FilesLoadingError } from "@acloud/client";
 import { useContext, useEffect } from "react";
+import { Link } from "wouter";
 import { useClient } from "../hooks/client";
 import { FilesContext } from "../providers/FilesProvider";
 import Thumbnail from "./Thumbnail";
@@ -26,14 +27,22 @@ const FileTable: React.FC<FileTableProps> = ({ className }) => {
       });
   }, [getFiles]);
 
+  if (files.length === 0)
+    return (
+      <p>
+        No files. Please{" "}
+        <Link className="underline" to="/uploader">
+          Upload
+        </Link>{" "}
+        some.
+      </p>
+    );
+
   return (
     <section className={className}>
-      <ul className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+      <ul className="grid grid-cols-[repeat(auto-fit,minmax(15vw,100px))] gap-4">
         {files.map((fileData) => (
-          <li key={fileData.fileId}>
-            <Thumbnail {...fileData} />
-            {/* <p>{fileData.metadata.fileName}</p> */}
-          </li>
+          <Thumbnail {...fileData} key={fileData.fileId} />
         ))}
       </ul>
     </section>

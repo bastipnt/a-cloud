@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
 import FileTable from "../components/FileTable";
-import { IMAGE_SLUG, PDF_SLUG } from "../utils/urlHelper";
+import { IMAGE_SLUG, MARKDOWN_SLUG, PDF_SLUG } from "../utils/urlHelper";
 
 const Index: React.FC = () => {
   const [_, navigate] = useLocation();
@@ -9,12 +9,13 @@ const Index: React.FC = () => {
   // TODO: find a better way to do this
   const [matchImage] = useRoute(`/${IMAGE_SLUG}/:id`);
   const [matchPDF] = useRoute(`/${PDF_SLUG}/:id`);
+  const [matchMD] = useRoute(`/${MARKDOWN_SLUG}/:id`);
   const [matchUploader] = useRoute("/uploader");
   const [matchRoot] = useRoute("/");
 
   useEffect(() => {
-    if (!matchRoot && !matchImage && !matchUploader && !matchPDF) navigate("/");
-  }, [matchImage, matchRoot, matchUploader, matchPDF]);
+    if (!matchRoot && !matchImage && !matchUploader && !matchPDF && !matchMD) navigate("/");
+  }, [matchImage, matchRoot, matchUploader, matchPDF, matchMD]);
 
   return (
     <>

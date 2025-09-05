@@ -12,7 +12,6 @@ export const decryptFileToUnit8Array = async (
   encryptedFileData: Uint8Array,
   fileKey: Base64URLString,
   decryptionHeader: Base64URLString,
-  fileName: string,
   chunkCount: number = 1,
 ): Promise<Uint8Array> => {
   await sodium.ready;
@@ -37,13 +36,7 @@ export const decryptFile = async (
   chunkCount: number = 1,
 ): Promise<File> =>
   unit8ArrayToFile(
-    await decryptFileToUnit8Array(
-      encryptedFileData,
-      fileKey,
-      decryptionHeader,
-      fileName,
-      chunkCount,
-    ),
+    await decryptFileToUnit8Array(encryptedFileData, fileKey, decryptionHeader, chunkCount),
     fileName,
   );
 

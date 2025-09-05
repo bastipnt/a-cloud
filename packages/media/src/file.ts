@@ -8,7 +8,7 @@ export type FileMetadata = {
   chunkCount: number;
   fileSize: number;
   lastModifiedMs: number;
-  fileType?: FileTypeResult;
+  fileType: FileTypeResult;
 };
 
 export type FileData = {

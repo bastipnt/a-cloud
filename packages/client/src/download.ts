@@ -28,7 +28,6 @@ export const loadThumbnail = async ({
 
 export type LoadImageParams = {
   fileId: string;
-  fileName: string;
   fileKey: Base64URLString;
   fileDecryptionHeader: Base64URLString;
   chunkCount: number;
@@ -40,7 +39,9 @@ export const loadImage = async ({
   fileKey,
   fileDecryptionHeader,
   chunkCount,
-}: LoadImageParams) => {
+}: LoadImageParams & {
+  fileName: string;
+}) => {
   const res = await api.download({ fileId }).get();
 
   if (res.status !== 200 || !res.data) throw new FileDownloadError();
@@ -51,7 +52,6 @@ export const loadImage = async ({
 
 export const loadFileToUnit8Array = async ({
   fileId,
-  fileName,
   fileKey,
   fileDecryptionHeader,
   chunkCount,
@@ -61,11 +61,5 @@ export const loadFileToUnit8Array = async ({
   if (res.status !== 200 || !res.data) throw new FileDownloadError();
   const encryptedFileData = new Uint8Array(res.data as unknown as ArrayBuffer);
 
-  return decryptFileToUnit8Array(
-    encryptedFileData,
-    fileKey,
-    fileDecryptionHeader,
-    fileName,
-    chunkCount,
-  );
+  return decryptFileToUnit8Array(encryptedFileData, fileKey, fileDecryptionHeader, chunkCount);
 };

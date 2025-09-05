@@ -29,7 +29,7 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
   let encryptedThumbnail: File | undefined;
   let thumbnailDecryptionHeader: Base64URLString | undefined;
 
-  if (fileType?.mime.startsWith("image/")) {
+  if (fileType.mime.startsWith("image/")) {
     const thumbnail = await generateImageThumbnailCanvas(file);
     [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
       thumbnail,
@@ -37,7 +37,7 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
     );
   }
 
-  if (fileType?.mime === "application/pdf") {
+  if (fileType.mime === "application/pdf") {
     const thumbnail = await generatePDFThumbnail(file);
     [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
       thumbnail,
