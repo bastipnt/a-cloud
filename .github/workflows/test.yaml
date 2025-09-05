@@ -58,11 +58,7 @@ jobs:
         run: bun run check
 
       - name: Lint
-        uses: actions/checkout@v4
-        run: bunx --yes oxlint@0.0.0 --deny-warnings
-
-      # - name: Lint
-      #   run: bun run lint
+        run: bun run lint
 
       - name: Run server tests
         run: bun run test:server
