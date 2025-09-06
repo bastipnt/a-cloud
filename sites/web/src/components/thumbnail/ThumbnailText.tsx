@@ -1,9 +1,7 @@
 import { uint8ArrayToText } from "@acloud/common";
 import { FileData } from "@acloud/media";
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
-import { useClient } from "../hooks/client";
-import { getMarkdownPreviewUrl } from "../utils/urlHelper";
+import { useClient } from "../../hooks/client";
 
 const ThumbnailText: React.FC<FileData> = ({ fileId, fileKey, fileDecryptionHeader, metadata }) => {
   const [text, setText] = useState("");
@@ -20,13 +18,10 @@ const ThumbnailText: React.FC<FileData> = ({ fileId, fileKey, fileDecryptionHead
   }, [fileId, fileKey, fileDecryptionHeader, metadata.chunkCount]);
 
   return (
-    <Link
-      className="absolute h-full w-full overflow-hidden bg-gray-800 p-2 text-[10px]"
-      to={getMarkdownPreviewUrl(fileId)}
-    >
+    <pre className="overflow-hidden bg-gray-800 p-2 text-[8px]">
       {/* <Markdown>{text}</Markdown> */}
       {text}
-    </Link>
+    </pre>
   );
 };
 

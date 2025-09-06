@@ -1,15 +1,14 @@
 import { uint8ArrayToText } from "@acloud/common";
 import { FileData } from "@acloud/media";
-import Markdown from "marked-react";
 import { useEffect, useState } from "react";
 import { Link, useRoute } from "wouter";
 import Close from "../components/svg/Close";
 import Spinner from "../components/svg/Spinner";
 import { useClient } from "../hooks/client";
 import { useModalScroll } from "../hooks/modalScroll";
-import { MARKDOWN_SLUG } from "../utils/urlHelper";
+import { TEXT_SLUG } from "../utils/urlHelper";
 
-const MarkdownPreview: React.FC = () => {
+const TextPreview: React.FC = () => {
   useModalScroll();
 
   const [text, setText] = useState("");
@@ -17,7 +16,7 @@ const MarkdownPreview: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState<FileData["metadata"]>();
-  const [matchMarkdown, params] = useRoute(`/${MARKDOWN_SLUG}/:fileId`);
+  const [matchMarkdown, params] = useRoute(`/${TEXT_SLUG}/:fileId`);
 
   const load = async (fileId: string) => {
     setLoading(true);
@@ -52,11 +51,11 @@ const MarkdownPreview: React.FC = () => {
       {loading && <Spinner className="fixed top-4 right-4" />}
       {text && (
         <pre className="overflow-x-hidden overflow-y-scroll p-16 break-words whitespace-pre-wrap">
-          <Markdown>{text}</Markdown>
+          {text}
         </pre>
       )}
     </section>
   );
 };
 
-export default MarkdownPreview;
+export default TextPreview;

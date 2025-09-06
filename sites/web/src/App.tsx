@@ -14,8 +14,9 @@ import UserProvider from "./providers/UserProvider";
 import ImagePreview from "./sub-pages/ImagePreview";
 import MarkdownPreview from "./sub-pages/MarkdownPreview";
 import PDFPreview from "./sub-pages/PDFPreview";
+import TextPreview from "./sub-pages/TextPreview";
 import Uploader from "./sub-pages/Uploader";
-import { IMAGE_SLUG, MARKDOWN_SLUG, PDF_SLUG } from "./utils/urlHelper";
+import { IMAGE_SLUG, MARKDOWN_SLUG, PDF_SLUG, TEXT_SLUG } from "./utils/urlHelper";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
                     <Route path={`/${IMAGE_SLUG}/:id`} component={ImagePreview} />
                     <Route path={`/${PDF_SLUG}/:id`} component={PDFPreview} />
                     <Route path={`/${MARKDOWN_SLUG}/:id`} component={MarkdownPreview} />
+                    <Route path={`/${TEXT_SLUG}/:id`} component={TextPreview} />
                     <Route path="/uploader" component={Uploader} />
                   </FilesProvider>
                 </UserProvider>

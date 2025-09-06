@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { Link } from "wouter";
 import { useClient } from "../hooks/client";
 import { FilesContext } from "../providers/FilesProvider";
-import Thumbnail from "./Thumbnail";
+import Thumbnail from "./thumbnail/Thumbnail";
 
 type FileTableProps = {
   className?: string;
@@ -40,9 +40,9 @@ const FileTable: React.FC<FileTableProps> = ({ className }) => {
 
   return (
     <section className={className}>
-      <ul className="grid grid-cols-[repeat(auto-fit,minmax(15vw,100px))] gap-4">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(150px,100%),1fr))] gap-4">
         {files.map((fileData) => (
-          <Thumbnail {...fileData} key={fileData.fileId} />
+          <Thumbnail key={fileData.fileId} {...fileData} />
         ))}
       </ul>
     </section>
