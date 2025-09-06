@@ -23,6 +23,8 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
     else if (metadata.fileType.mime === "text/markdown")
       setPreviewUrl(getMarkdownPreviewUrl(fileId));
     else if (metadata.fileType.mime.startsWith("text")) setPreviewUrl(getTextPreviewUrl(fileId));
+    else if (metadata.fileType.mime === "application/json")
+      setPreviewUrl(getTextPreviewUrl(fileId));
     else setPreviewUrl(getDownloadUrl(fileId));
   }, [metadata.fileType.mime, fileId]);
 

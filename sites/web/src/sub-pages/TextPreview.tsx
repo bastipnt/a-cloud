@@ -1,6 +1,8 @@
 import { uint8ArrayToText } from "@acloud/common";
 import { FileData } from "@acloud/media";
 import { useEffect, useState } from "react";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { Link, useRoute } from "wouter";
 import Close from "../components/svg/Close";
 import Spinner from "../components/svg/Spinner";
@@ -44,15 +46,26 @@ const TextPreview: React.FC = () => {
   }, [matchMarkdown, params?.fileId, getFile]);
 
   return (
-    <section className="fixed top-0 left-0 flex h-full w-full flex-row justify-center bg-white align-middle dark:bg-gray-900">
-      <Link className="absolute top-4 right-4 z-10 cursor-pointer" to="/">
-        <Close />
-      </Link>
-      {loading && <Spinner className="fixed top-4 right-4" />}
+    <section className="fixed top-0 left-0 h-full w-full overflow-y-scroll bg-white align-middle dark:bg-gray-900">
+      <div className="sticky top-0 left-0 z-10 flex w-full flex-row justify-between bg-gray-900/70 p-4">
+        <h2 className="text-lg">{metadata?.fileName}</h2>
+        <Link className="cursor-pointer" to="/">
+          <Close />
+        </Link>
+      </div>
+      {loading && <Spinner className="fixed right-4 bottom-4" />}
       {text && (
-        <pre className="overflow-x-hidden overflow-y-scroll p-16 break-words whitespace-pre-wrap">
-          {text}
-        </pre>
+        <div className="p-8">
+          <SyntaxHighlighter
+            language={metadata?.fileType.ext}
+            style={atomOneDark}
+            customStyle={{ backgroundColor: "inherit" }}
+            showLineNumbers
+            wrapLongLines
+          >
+            {text}
+          </SyntaxHighlighter>
+        </div>
       )}
     </section>
   );
