@@ -1,6 +1,7 @@
 import { FileData } from "@acloud/media";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { useIntersection } from "../../hooks/intersection";
 import {
   getDownloadUrl,
   getImagePreviewUrl,
@@ -10,11 +11,15 @@ import {
 } from "../../utils/urlHelper";
 import FileIcon from "../svg/FileIcon";
 import MoreIcon from "../svg/MoreIcon";
+import ThumbnailAudio from "./ThumbnailAudio";
 import ThumbnailImage from "./ThumbnailImage";
 import ThumbnailText from "./ThumbnailText";
 
 const Thumbnail: React.FC<FileData> = (fileData) => {
   const { metadata, fileId } = fileData;
+  const liRef = useRef<HTMLLIElement>(null);
+  const [showThumbnail, setShowThumbnail] = useState(false);
+
   const [previewUrl, setPreviewUrl] = useState("");
 
   useEffect(() => {
@@ -36,16 +41,30 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
     metadata.fileType.mime === "application/json"
   )
     thumbnailEl = <ThumbnailText {...fileData} />;
-  else thumbnailEl = <FileIcon className="absolute h-full w-full p-4 text-violet-400" />;
+  else if (metadata.fileType.mime.startsWith("audio"))
+    thumbnailEl = <ThumbnailAudio {...fileData} />;
+  else {
+    thumbnailEl = (
+      <FileIcon
+        className="absolute h-full w-full p-4 text-violet-400"
+        extension={metadata.fileType.ext}
+      />
+    );
+  }
+
+  useIntersection(liRef, (elements) => {
+    const [element] = elements;
+    if (element.isIntersecting) setShowThumbnail(true);
+  });
 
   return (
-    <li className="">
+    <li ref={liRef}>
       <Link to={previewUrl} className="space-y-2">
         <span className="relative block overflow-hidden rounded-lg after:block after:pb-[100%] after:content-['']">
-          <span className="absolute h-full w-full bg-gray-800">{thumbnailEl}</span>
-          {/* <span className="absolute right-2 bottom-2 rounded-md bg-emerald-600/90 px-2">
-          {metadata.fileType.ext}
-        </span> */}
+          <span className="absolute h-full w-full bg-gray-800">{showThumbnail && thumbnailEl}</span>
+          <span className="absolute right-2 bottom-2">
+            <FileIcon className="h-8 w-8" extension={metadata.fileType.ext} />
+          </span>
         </span>
         <p className="flex flex-row px-1">
           <span className="overflow-hidden text-ellipsis whitespace-nowrap">

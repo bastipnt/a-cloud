@@ -1,17 +1,35 @@
+import { generateManifest, ManifestConfig } from "material-icon-theme";
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
-interface FileIconProps {
+const config: ManifestConfig = {
+  activeIconPack: "react",
+};
+
+const manifest = generateManifest(config);
+
+const getIconName = (extension: string) => {
+  if (!manifest.fileExtensions || !manifest.iconDefinitions) return "";
+  const iconName = manifest.fileExtensions[extension];
+  return iconName;
+};
+
+type FileIconProps = {
+  extension: string;
   size?: number;
   color?: string;
   className?: string;
-}
+};
 
 export const FileIcon: React.FC<FileIconProps> = ({
+  extension,
   size = 24,
   color = "currentColor",
   className = "",
 }) => {
-  return (
+  const iconName = getIconName(extension);
+
+  const fallbackSVG = (
     <svg
       width={size}
       height={size}
@@ -36,6 +54,13 @@ export const FileIcon: React.FC<FileIconProps> = ({
       />
     </svg>
   );
+
+  if (iconName)
+    return (
+      <img src={`/material-icons/${iconName}.svg`} className={twMerge("h-24 w-24", className)} />
+    );
+
+  return fallbackSVG;
 };
 
 export default FileIcon;

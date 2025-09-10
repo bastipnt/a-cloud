@@ -1,6 +1,7 @@
 import { createCryptoWorker, encryptObject, genFileKeyBase64 } from "@acloud/crypto";
 import {
   detectFileType,
+  generateAudioThumbnail,
   generateImageThumbnailCanvas,
   generatePDFThumbnail,
   type FileData,
@@ -43,6 +44,15 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
       thumbnail,
       fileKey,
     );
+  }
+
+  if (fileType.mime.startsWith("audio")) {
+    const thumbnail = await generateAudioThumbnail(file);
+
+    // [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
+    //   thumbnail,
+    //   fileKey,
+    // );
   }
 
   const [encryptedFile, fileParams] = await cryptoWorker.encryptFile(file, fileKey);

@@ -1,5 +1,7 @@
 import * as pdfjsLib from "pdfjs-dist";
+// @ts-expect-error
 import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+import { extractAudioMetadata } from "./audioFile";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -114,4 +116,15 @@ export const generatePDFThumbnail = async (pdfFile: File) => {
   await renderTask.promise;
 
   return await canvasToCompressedJPEG(canvas, MAX_THUMBNAIL_SIZE);
+};
+
+export const generateAudioThumbnail = async (audioFile: File) => {
+  const audioMetadata = await extractAudioMetadata(audioFile);
+  console.log(audioMetadata);
+
+  const coverImages = audioMetadata.common.picture;
+  if (!coverImages || coverImages.length === 0) return;
+
+  // TODO: is unit8array -> to file
+  const [coverImage] = coverImages;
 };
