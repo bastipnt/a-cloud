@@ -1,4 +1,11 @@
 import { FileData } from "@acloud/media";
+import {
+  autoPlacement,
+  useClick,
+  useFloating,
+  useFocus,
+  useInteractions,
+} from "@floating-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { useIntersection } from "../../hooks/intersection";
@@ -57,6 +64,21 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
     if (element.isIntersecting) setShowThumbnail(true);
   });
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { refs, floatingStyles, context } = useFloating({
+    open: menuOpen,
+    onOpenChange: setMenuOpen,
+    middleware: [
+      autoPlacement({
+        allowedPlacements: ["top", "top-start", "top-end", "bottom", "bottom-start", "bottom-end"],
+      }),
+    ],
+  });
+  const focus = useFocus(context);
+  const click = useClick(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, focus]);
+
   return (
     <li ref={liRef}>
       <Link to={previewUrl} className="space-y-2">
@@ -77,9 +99,20 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
         <span className="text-xs text-gray-400">
           {new Date(metadata.lastModifiedMs).toLocaleDateString("de-DE")}
         </span>
-        <button className="cursor-pointer">
+        <button ref={refs.setReference} className="cursor-pointer" {...getReferenceProps()}>
           <MoreIcon className="text-gray-300" size={20} />
         </button>
+        {menuOpen && (
+          <ul
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className="z-10 overflow-hidden rounded-lg bg-gray-700 [&_li]:cursor-pointer [&_li]:px-4 [&_li]:py-2 [&_li]:shadow [&_li]:not-last:border-b [&_li]:hover:bg-gray-800"
+            {...getFloatingProps()}
+          >
+            <li>Info</li>
+            <li>Delete</li>
+          </ul>
+        )}
       </div>
     </li>
   );
