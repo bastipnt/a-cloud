@@ -49,10 +49,12 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
   if (fileType.mime.startsWith("audio")) {
     const thumbnail = await generateAudioThumbnail(file);
 
-    // [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
-    //   thumbnail,
-    //   fileKey,
-    // );
+    if (thumbnail) {
+      [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
+        thumbnail,
+        fileKey,
+      );
+    }
   }
 
   const [encryptedFile, fileParams] = await cryptoWorker.encryptFile(file, fileKey);

@@ -56,7 +56,7 @@ const scaledImageDimensions = (
   return resizedDimensions;
 };
 
-export const generateImageThumbnailCanvas = async (image: File) => {
+export const generateImageThumbnailCanvas = async (image: File | Blob) => {
   const canvas = document.createElement("canvas");
   const canvasCtx = canvas.getContext("2d")!;
 
@@ -126,5 +126,10 @@ export const generateAudioThumbnail = async (audioFile: File) => {
   if (!coverImages || coverImages.length === 0) return;
 
   // TODO: is unit8array -> to file
-  const [coverImage] = coverImages;
+  const [coverImageData] = coverImages;
+  if (!coverImageData) return;
+
+  const coverImage = new Blob([coverImageData.data], { type: "image/png" });
+
+  return generateImageThumbnailCanvas(coverImage);
 };

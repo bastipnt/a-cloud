@@ -62,7 +62,7 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
       <Link to={previewUrl} className="space-y-2">
         <span className="relative block overflow-hidden rounded-lg after:block after:pb-[100%] after:content-['']">
           <span className="absolute h-full w-full bg-gray-800">{showThumbnail && thumbnailEl}</span>
-          <span className="absolute right-2 bottom-2">
+          <span className="absolute right-1 bottom-1 rounded-lg bg-gray-800 p-1">
             <FileIcon className="h-8 w-8" extension={metadata.fileType.ext} />
           </span>
         </span>
