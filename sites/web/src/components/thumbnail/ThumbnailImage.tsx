@@ -1,7 +1,6 @@
 import { FileData } from "@acloud/media";
-import { useContext, useEffect, useState } from "react";
-import { useClient } from "../../hooks/client";
-import { FilesContext } from "../../providers/FilesProvider";
+import { useLoadThumbnail } from "../../hooks/thumbnail";
+import FileIcon from "../svg/FileIcon";
 
 const ThumbnailImage: React.FC<FileData> = ({
   fileId,
@@ -9,29 +8,14 @@ const ThumbnailImage: React.FC<FileData> = ({
   fileKey,
   thumbnailDecryptionHeader,
 }) => {
-  const [imgSrc, setImg] = useState<string>();
-  const { loadThumbnail } = useClient();
-  const { addThumbnail, getThumbnail } = useContext(FilesContext);
+  const imgSrc = useLoadThumbnail({ fileId, metadata, fileKey, thumbnailDecryptionHeader });
 
-  const setImgSrc = (thumbnail: File) => setImg(URL.createObjectURL(thumbnail));
-
-  useEffect(() => {
-    if (!thumbnailDecryptionHeader) return;
-
-    const thumbnail = getThumbnail(fileId);
-
-    if (thumbnail) return setImgSrc(thumbnail.file);
-
-    loadThumbnail({
-      fileId,
-      fileName: metadata.fileName,
-      fileKey,
-      thumbnailDecryptionHeader,
-    }).then((thumbnailFile) => {
-      setImgSrc(thumbnailFile);
-      addThumbnail({ fileId, file: thumbnailFile });
-    });
-  }, []);
+  if (!imgSrc)
+    return (
+      <span className="inline-flex h-full w-full items-center justify-center">
+        <FileIcon className="h-24 w-24" extension={metadata.fileType.ext} />
+      </span>
+    );
 
   return (
     <img
