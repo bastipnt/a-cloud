@@ -1,4 +1,4 @@
-import { db, filesTable } from "@acloud/db";
+import { and, db, eq, filesTable, getDateNow } from "@acloud/db";
 import Elysia, { t } from "elysia";
 import { withUserId } from "./user";
 
@@ -27,7 +27,7 @@ type UploadParams = typeof uploadParams.static;
 class FileController {
   async getFiles(userId: string) {
     return await db.query.filesTable.findMany({
-      where: (f, { eq }) => eq(f.ownerId, userId),
+      where: (f, { eq, and, isNull }) => and(eq(f.ownerId, userId), isNull(f.deletedAt)),
       orderBy: (f, { desc }) => desc(f.createdAt),
       columns: {
         ownerId: false,
@@ -62,6 +62,14 @@ class FileController {
 
     return fileRes[0].fileId;
   }
+
+  // TODO: if isDir also delete children
+  async softDeleteFile(userId: string, fileId: string) {
+    await db
+      .update(filesTable)
+      .set({ deletedAt: getDateNow() })
+      .where(and(eq(filesTable.ownerId, userId), eq(filesTable.fileId, fileId)));
+  }
 }
 
 const fileService = new Elysia({ name: "file/service" }).model({ fileParams, uploadParams });
@@ -92,4 +100,13 @@ export const fileRoutes = new Elysia({ prefix: "/files" })
       return { message: "saved", fileId };
     },
     { body: "uploadParams" },
+  )
+  .post(
+    "/soft-delete/:fileId",
+    async ({ params: { fileId }, fileController, userId }) => {
+      await fileController.softDeleteFile(userId, fileId);
+
+      return { message: "deleted", fileId };
+    },
+    { params: fileParams },
   );

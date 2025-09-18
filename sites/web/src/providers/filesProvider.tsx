@@ -11,6 +11,7 @@ type FilesContextType = {
   files: FileData[];
   setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
   addFiles: (files: FileData[]) => void;
+  removeFiles: (fileIds: string[]) => void;
 
   thumbnails: Thumbnail[];
   setThumbnails: React.Dispatch<React.SetStateAction<Thumbnail[]>>;
@@ -25,6 +26,7 @@ export const FilesContext = createContext<FilesContextType>({
   files: [],
   setFiles: () => {},
   addFiles: () => {},
+  removeFiles: () => {},
 
   thumbnails: [],
   setThumbnails: () => {},
@@ -43,6 +45,10 @@ const FilesProvider: React.FC<FilesProviderProps> = ({ children }) => {
   const [files, setFiles] = useState<FileData[]>([]);
   const addFiles = (newFiles: FileData[]) =>
     setFiles((oldFiles) => arrayUniqueByKey([...newFiles, ...oldFiles], "fileId"));
+
+  const removeFiles = (fileIds: string[]) => {
+    setFiles((oldFiles) => oldFiles.filter(({ fileId }) => !fileIds.includes(fileId)));
+  };
 
   const [thumbnails, setThumbnails] = useState<Thumbnail[]>([]);
   const addThumbnail = (newThumbnail: Thumbnail) =>
@@ -75,6 +81,7 @@ const FilesProvider: React.FC<FilesProviderProps> = ({ children }) => {
         files,
         setFiles,
         addFiles,
+        removeFiles,
         thumbnails,
         setThumbnails,
         addThumbnail,

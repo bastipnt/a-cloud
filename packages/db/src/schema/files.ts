@@ -37,6 +37,8 @@ export const filesTable = pgTable("files", {
   updatedAt: timestamp()
     .notNull()
     .$defaultFn(() => getDateNow()),
+
+  deletedAt: timestamp(),
 });
 
 export const filesUsersRelations = relations(filesTable, ({ one }) => ({

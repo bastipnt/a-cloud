@@ -16,7 +16,8 @@ export type FileData = {
   fileDecryptionHeader: Base64URLString | null;
   thumbnailDecryptionHeader: Base64URLString | null;
   fileKey: Base64URLString;
+  metadata: FileMetadata;
   createdAt: Date;
   updatedAt: Date;
-  metadata: FileMetadata;
+  deletedAt: Date | null;
 };

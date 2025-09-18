@@ -11,6 +11,7 @@ import {
   signIn,
   signOut,
   signUp,
+  softDeleteFile,
   verifyOTT,
 } from "@acloud/client";
 import { FileData } from "@acloud/media";
@@ -60,6 +61,7 @@ export const useClient = () => {
     proofSignIn,
     signUp,
     signOut,
+    softDeleteFile,
     finishSignUp,
     verifyOTT,
     getUser,

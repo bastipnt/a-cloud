@@ -6,9 +6,11 @@ import {
   useFocus,
   useInteractions,
 } from "@floating-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { useClient } from "../../hooks/client";
 import { useIntersection } from "../../hooks/intersection";
+import { FilesContext } from "../../providers/FilesProvider";
 import {
   getDownloadUrl,
   getImagePreviewUrl,
@@ -26,7 +28,6 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
   const { metadata, fileId } = fileData;
   const liRef = useRef<HTMLLIElement>(null);
   const [showThumbnail, setShowThumbnail] = useState(false);
-
   const [previewUrl, setPreviewUrl] = useState("");
 
   useEffect(() => {
@@ -79,6 +80,14 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
 
   const { getReferenceProps, getFloatingProps } = useInteractions([click, focus]);
 
+  const { removeFiles } = useContext(FilesContext);
+  const { softDeleteFile } = useClient();
+
+  const handleSoftDeleteFile = async () => {
+    await softDeleteFile(fileId);
+    removeFiles([fileId]);
+  };
+
   return (
     <li ref={liRef}>
       <Link to={previewUrl} className="space-y-2">
@@ -110,7 +119,11 @@ const Thumbnail: React.FC<FileData> = (fileData) => {
             {...getFloatingProps()}
           >
             <li>Info</li>
-            <li>Delete</li>
+            <li>
+              <button className="cursor-pointer" onClick={handleSoftDeleteFile}>
+                Delete
+              </button>
+            </li>
           </ul>
         )}
       </div>

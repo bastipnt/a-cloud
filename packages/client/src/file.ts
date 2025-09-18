@@ -25,9 +25,10 @@ const getFileData = async (
     fileDecryptionHeader,
     thumbnailDecryptionHeader,
     metadataDecryptionHeader,
+    encryptedMetadata,
     createdAt,
     updatedAt,
-    encryptedMetadata,
+    deletedAt,
   } = encryptedFileData;
   const fileKey = await decryptBoxBase64(encryptedFileKey, fileKeyNonce, mainKey);
 
@@ -47,6 +48,7 @@ const getFileData = async (
     metadata,
     createdAt,
     updatedAt,
+    deletedAt,
   };
 };
 
@@ -68,3 +70,5 @@ export const getFile = async (fileId: string, mainKey: Base64URLString): Promise
 
   return getFileData(file, mainKey);
 };
+
+export const softDeleteFile = (fileId: string) => api.files["soft-delete"]({ fileId }).post();

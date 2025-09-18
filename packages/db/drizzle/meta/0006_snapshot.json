@@ -1,0 +1,419 @@
+{
+  "id": "bf48981c-b1ba-4dec-baa6-4eb28e802abf",
+  "prevId": "ea419e23-5f80-4f55-83b9-c2caa8801506",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.files": {
+      "name": "files",
+      "schema": "",
+      "columns": {
+        "fileId": {
+          "name": "fileId",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "parentId": {
+          "name": "parentId",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isDir": {
+          "name": "isDir",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isLocal": {
+          "name": "isLocal",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ownerId": {
+          "name": "ownerId",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileDecryptionHeader": {
+          "name": "fileDecryptionHeader",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thumbnailDecryptionHeader": {
+          "name": "thumbnailDecryptionHeader",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadataDecryptionHeader": {
+          "name": "metadataDecryptionHeader",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "encryptedMetadata": {
+          "name": "encryptedMetadata",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryptedFileKey": {
+          "name": "encryptedFileKey",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileKeyNonce": {
+          "name": "fileKeyNonce",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deletedAt": {
+          "name": "deletedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "files_ownerId_users_userId_fk": {
+          "name": "files_ownerId_users_userId_fk",
+          "tableFrom": "files",
+          "tableTo": "users",
+          "columnsFrom": [
+            "ownerId"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.keys": {
+      "name": "keys",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "keyEncryptionKeySalt": {
+          "name": "keyEncryptionKeySalt",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryptedMainKey": {
+          "name": "encryptedMainKey",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mainKeyNonce": {
+          "name": "mainKeyNonce",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryptedMainKeyWithRecoveryKey": {
+          "name": "encryptedMainKeyWithRecoveryKey",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mainKeyWithRecoveryKeyNonce": {
+          "name": "mainKeyWithRecoveryKeyNonce",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryptedRecoveryKey": {
+          "name": "encryptedRecoveryKey",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recoveryKeyNonce": {
+          "name": "recoveryKeyNonce",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryptedPrivateKey": {
+          "name": "encryptedPrivateKey",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "privateKeyNonce": {
+          "name": "privateKeyNonce",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publicKey": {
+          "name": "publicKey",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "memLimit": {
+          "name": "memLimit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opsLimit": {
+          "name": "opsLimit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "keys_userId_users_userId_fk": {
+          "name": "keys_userId_users_userId_fk",
+          "tableFrom": "keys",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.otts": {
+      "name": "otts",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ott": {
+          "name": "ott",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "otts_userId_users_userId_fk": {
+          "name": "otts_userId_users_userId_fk",
+          "tableFrom": "otts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.srps": {
+      "name": "srps",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "srpSalt": {
+          "name": "srpSalt",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srpVerifier": {
+          "name": "srpVerifier",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "srps_userId_users_userId_fk": {
+          "name": "srps_userId_users_userId_fk",
+          "tableFrom": "srps",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "encryptedEmail": {
+          "name": "encryptedEmail",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "emailNonce": {
+          "name": "emailNonce",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "emailHash": {
+          "name": "emailHash",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hasTwoFactorEnabled": {
+          "name": "hasTwoFactorEnabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hasEmailVerified": {
+          "name": "hasEmailVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_encryptedEmail_unique": {
+          "name": "users_encryptedEmail_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "encryptedEmail"
+          ]
+        },
+        "users_emailHash_unique": {
+          "name": "users_emailHash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "emailHash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

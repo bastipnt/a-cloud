@@ -1,19 +1,19 @@
 export {
-  loadThumbnail,
-  loadImage,
   loadFileToUnit8Array,
+  loadImage,
+  loadThumbnail,
   type LoadThumbnailParams,
 } from "./src/download";
 export {
-  signIn,
-  proofSignIn,
-  signUp,
-  signOut,
-  finishSignUp,
-  verifyOTT,
-  getUser,
   SignInError,
+  finishSignUp,
+  getUser,
+  proofSignIn,
+  signIn,
+  signOut,
+  signUp,
+  verifyOTT,
 } from "./src/user";
 
+export { FilesLoadingError, getFile, getFiles, softDeleteFile } from "./src/file";
 export { uploadFiles } from "./src/upload";
-export { getFiles, getFile, FilesLoadingError } from "./src/file";
