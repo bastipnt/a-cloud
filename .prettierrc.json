@@ -3,9 +3,5 @@
   "tabWidth": 2,
   "printWidth": 100,
   "endOfLine": "lf",
-  "plugins": [
-    "@prettier/plugin-oxc",
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-tailwindcss"
-  ]
+  "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
 }

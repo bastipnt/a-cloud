@@ -11,7 +11,7 @@ import {
 } from "@acloud/db";
 import { genJWT, testUsers } from "@acloud/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterAll, beforeAll, beforeEach, describe, expect, it, Mock } from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, Mock } from "vitest";
 import { useLocation } from "wouter";
 import OTT from "./OTT";
 

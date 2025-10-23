@@ -8,13 +8,13 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/libsodium-wrappers-sumo": "^0.7.8"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@types/libsodium-wrappers-sumo": "^0.7.8",
+    "bun-types": "^1.3.0"
   },
   "type": "module",
   "dependencies": {
+    "@acloud/common": "workspace:*",
+    "@swan-io/srp": "^0.2.6",
     "comlink": "^4.4.2",
     "libsodium-wrappers-sumo": "^0.7.15"
   }

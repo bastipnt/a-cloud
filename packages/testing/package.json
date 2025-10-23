@@ -10,11 +10,8 @@
     "@acloud/config": "workspace:*",
     "@acloud/crypto": "workspace:*",
     "@acloud/server": "workspace:*",
-    "@elysiajs/jwt": "^1.2.0",
+    "@elysiajs/jwt": "^1.4.0",
     "@types/bun": "latest",
-    "tough-cookie": "^5.1.2"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "tough-cookie": "^6.0.0"
   }
 }

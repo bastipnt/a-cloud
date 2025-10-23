@@ -3,7 +3,7 @@ import { genNonce } from "./generate";
 import { fromBase64, toBase64 } from "./util/conversion-helper";
 import { blobToUnit8Array, fileStreamToFile, readFileToStream } from "./util/file-helper";
 
-type FileParams = {
+export type FileParams = {
   decryptionHeader: Base64URLString;
   chunkCount: number;
   fileSize: number;

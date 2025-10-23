@@ -1,4 +1,4 @@
-import { createCryptoWorker, encryptObject, genFileKeyBase64 } from "@acloud/crypto";
+import { genFileKeyBase64 } from "@acloud/crypto";
 import {
   detectFileType,
   generateAudioThumbnail,
@@ -6,75 +6,91 @@ import {
   generatePDFThumbnail,
   type FileData,
   type FileMetadata,
+  type FileTypeResult,
 } from "@acloud/media";
 import { api } from "../api";
+import type { CryptoWorkerPool } from "./worker-pools/crypto-worker-pool";
 
-export class FileSaveError extends Error {
-  override name: string = "FileSaveError";
+class FileInfoUploadError extends Error {
+  override name: string = "FileInfoUploadError";
 }
 
-export class FileUploadError extends Error {
+class FileUploadError extends Error {
   override name: string = "FileUploadError";
 }
 
-export class ThumbnailUploadError extends Error {
+class ThumbnailUploadError extends Error {
   override name: string = "ThumbnailUploadError";
 }
 
-const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileData> => {
-  const fileKey = await genFileKeyBase64();
-  const fileType = await detectFileType(file);
-
-  const cryptoWorker = await createCryptoWorker().remote;
-
-  let encryptedThumbnail: File | undefined;
-  let thumbnailDecryptionHeader: Base64URLString | undefined;
-
+const generateThumbnail = async (
+  file: File,
+  fileType: FileTypeResult,
+): Promise<Blob | undefined> => {
   if (fileType.mime.startsWith("image/")) {
-    const thumbnail = await generateImageThumbnailCanvas(file);
-    [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
-      thumbnail,
-      fileKey,
-    );
+    return generateImageThumbnailCanvas(file);
   }
 
   if (fileType.mime === "application/pdf") {
-    const thumbnail = await generatePDFThumbnail(file);
-    [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
+    return generatePDFThumbnail(file);
+  }
+
+  if (fileType.mime.startsWith("audio")) {
+    return generateAudioThumbnail(file);
+  }
+
+  return undefined;
+};
+
+export const uploadFile = async (
+  file: File,
+  mainKey: Base64URLString,
+  cryptoWorkerPool: CryptoWorkerPool,
+): Promise<FileData> => {
+  const fileKey = await genFileKeyBase64();
+  const fileType = await detectFileType(file);
+  const thumbnail = await generateThumbnail(file, fileType);
+
+  let [encryptedThumbnail, thumbnailDecryptionHeader]: [
+    File | undefined,
+    Base64URLString | undefined,
+  ] = [undefined, undefined];
+
+  if (thumbnail) {
+    [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorkerPool.encryptBlobToFile(
       thumbnail,
+      await thumbnail.arrayBuffer(),
       fileKey,
     );
   }
 
-  if (fileType.mime.startsWith("audio")) {
-    const thumbnail = await generateAudioThumbnail(file);
+  const [encryptedFile, fileParams] = await cryptoWorkerPool.encryptFile(
+    file,
+    await file.arrayBuffer(),
+    fileKey,
+  );
 
-    if (thumbnail) {
-      [encryptedThumbnail, thumbnailDecryptionHeader] = await cryptoWorker.encryptBlobToFile(
-        thumbnail,
-        fileKey,
-      );
-    }
-  }
-
-  const [encryptedFile, fileParams] = await cryptoWorker.encryptFile(file, fileKey);
-
-  const fileName = file.name;
   const metadata: FileMetadata = {
-    fileName,
+    fileName: file.name,
     chunkCount: fileParams.chunkCount,
     fileSize: fileParams.fileSize,
     lastModifiedMs: fileParams.lastModifiedMs,
     fileType,
   };
 
-  const [encryptedMetadata, metadataDecryptionHeader] = await encryptObject(metadata, fileKey);
+  const [encryptedMetadata, metadataDecryptionHeader] = await cryptoWorkerPool.encryptObject(
+    metadata,
+    fileKey,
+  );
 
-  const [encryptedFileKey, fileKeyNonce] = await cryptoWorker.encryptBoxBase64(fileKey, mainKey);
+  const [encryptedFileKey, fileKeyNonce] = await cryptoWorkerPool.encryptBoxBase64(
+    fileKey,
+    mainKey,
+  );
 
   const fileDecryptionHeader = fileParams.decryptionHeader;
 
-  const res = await api.files.post({
+  const fileInfoRes = await api.files.post({
     encryptedFileKey,
     fileKeyNonce,
 
@@ -84,21 +100,18 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
     encryptedMetadata,
     metadataDecryptionHeader,
   });
+  if (fileInfoRes.status !== 200 || !fileInfoRes.data) throw new FileInfoUploadError();
 
-  if (res.status !== 200) throw new FileSaveError();
+  const { fileId } = fileInfoRes.data;
 
-  const fileId = res.data!.fileId;
-
-  const uploadRes = await api.upload.file({ fileId }).post({ file: encryptedFile });
-
-  if (uploadRes.status !== 200) throw new FileUploadError();
+  const fileUploadRes = await api.upload.file({ fileId }).post({ file: encryptedFile });
+  if (fileUploadRes.status !== 200) throw new FileUploadError();
 
   if (encryptedThumbnail) {
-    const uploadThumbnailRes = await api.upload
+    const thumbnailUploadRes = await api.upload
       .thumbnail({ fileId })
       .post({ file: encryptedThumbnail });
-
-    if (uploadThumbnailRes.status !== 200) throw new ThumbnailUploadError();
+    if (thumbnailUploadRes.status !== 200) throw new ThumbnailUploadError();
   }
 
   return {
@@ -109,17 +122,6 @@ const uploadFile = async (file: File, mainKey: Base64URLString): Promise<FileDat
     thumbnailDecryptionHeader: thumbnailDecryptionHeader || null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    deletedAt: null,
   };
-};
-
-export const uploadFiles = async (files: File[], mainKey: Base64URLString) => {
-  const uploadedFileIds: FileData[] = [];
-
-  for (const file of files) {
-    const fileData = await uploadFile(file, mainKey);
-    if (!fileData) console.error("Upload error");
-    uploadedFileIds.push(fileData);
-  }
-
-  return uploadedFileIds;
 };

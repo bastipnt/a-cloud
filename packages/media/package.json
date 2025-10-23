@@ -7,18 +7,15 @@
   "devDependencies": {
     "@types/bun": "latest"
   },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
   "dependencies": {
     "@acloud/common": "workspace:*",
     "@acloud/crypto": "workspace:*",
     "@acloud/db": "workspace:*",
     "@acloud/server": "workspace:*",
     "@types/pdfjs-dist": "^2.10.378",
-    "elysia": "^1.2.25",
+    "elysia": "catalog:elysia",
     "file-type": "^21.0.0",
-    "music-metadata": "^11.8.3",
-    "pdfjs-dist": "^5.4.54"
+    "music-metadata": "^11.9.0",
+    "pdfjs-dist": "^5.4.296"
   }
 }

@@ -1,5 +1,6 @@
 import { FilesLoadingError } from "@acloud/client";
 import { useContext, useEffect } from "react";
+import { twMerge } from "tailwind-merge";
 import { Link } from "wouter";
 import { useClient } from "../hooks/client";
 import { FilesContext } from "../providers/FilesProvider";
@@ -39,13 +40,16 @@ const FileTable: React.FC<FileTableProps> = ({ className }) => {
     );
 
   return (
-    <section className={className}>
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(150px,100%),1fr))] gap-4">
-        {files.map((fileData) => (
-          <Thumbnail key={fileData.fileId} {...fileData} />
-        ))}
-      </ul>
-    </section>
+    <ul
+      className={twMerge(
+        "grid grid-cols-[repeat(auto-fill,minmax(min(150px,100%),1fr))] gap-4",
+        className,
+      )}
+    >
+      {files.map((fileData) => (
+        <Thumbnail key={fileData.fileId} {...fileData} />
+      ))}
+    </ul>
   );
 };
 

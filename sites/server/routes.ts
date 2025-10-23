@@ -1,13 +1,13 @@
 import Elysia from "elysia";
+import { userAuthRoutes } from "./src/auth";
 import { downloadRoutes } from "./src/download";
-import { fileRoutes } from "./src/file";
 import { uploadRoutes } from "./src/upload";
 import { userRoutes } from "./src/user";
-import { userAuthRoutes } from "./src/userAuth";
+import { fileDataRoutes } from "./src/file-data";
 
 export const routes = new Elysia()
   .use(userAuthRoutes)
   .use(userRoutes)
   .use(uploadRoutes)
   .use(downloadRoutes)
-  .use(fileRoutes);
+  .use(fileDataRoutes);

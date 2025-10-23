@@ -1,11 +1,11 @@
 import {
-  createCryptoWorker,
   deriveSrpClientSession,
   genSrpAttributes,
   genSrpClientEphemeral,
   verifySrpSession,
 } from "@acloud/crypto";
 import { api } from "../api";
+import type { CryptoWorkerPool } from "./worker-pools/crypto-worker-pool";
 
 type ProofSrpAttributes = {
   srpClientEphemeralSecret: string;
@@ -111,16 +111,16 @@ export const verifyOTT = async (email: string, ott: string) => {
   return res.status === 200;
 };
 
-export const finishSignUp = async (password: string) => {
-  const cryptoWorker = await createCryptoWorker().remote;
-
+export const finishSignUp = async (password: string, cryptoWorkerPool: CryptoWorkerPool) => {
   const srpParams = await genSrpAttributes(password);
-  const keyParams = await cryptoWorker.genNewUserKeys(password);
+  const keyParams = await cryptoWorkerPool.genNewUserKeys(password);
 
   const res = await api["user-auth"]["finish-sign-up"].put({
     srpParams,
     keyParams,
   });
+
+  console.log(res);
 
   if (res.status === 401 && res.error?.value === "Not Verified") {
     throw new NotVerifiedError();

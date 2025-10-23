@@ -10,4 +10,6 @@ export const uint8ArrayToText = (uint8: Uint8Array) => {
   return decoder.decode(uint8);
 };
 
+export { type Remote } from "comlink";
 export { ComlinkWorker } from "./src/comlink-worker";
+export { default as WorkerPool } from "./src/worker-pool";

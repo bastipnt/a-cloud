@@ -1,22 +1,26 @@
 import { NotVerifiedError, UserAlreadyVerifiedError } from "@acloud/client/src/user";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import FinishSignUpForm, { FinishSignUpFormValues } from "../forms/FinishSignUpForm";
 import { useClient } from "../hooks/client";
 import { useStorage } from "../hooks/storage";
+import { WorkerContext, WorkerPoolMissingError } from "../providers/WorkerProvider";
 
 const FinishSignUp: React.FC = () => {
   const { getEmail } = useStorage();
   const { finishSignUp } = useClient();
   const [_, navigate] = useLocation();
+  const { cryptoWorkerPool } = useContext(WorkerContext);
   const [existingEmail, setExistingEmail] = useState<string>("");
 
   const handleSubmit = async (values: FinishSignUpFormValues) => {
     const { password } = values;
     let success: boolean = false;
+    if (!cryptoWorkerPool?.current) throw new WorkerPoolMissingError();
 
     try {
-      success = await finishSignUp(password);
+      success = await finishSignUp(password, cryptoWorkerPool.current);
+      console.log("success", success);
     } catch (error) {
       if (error instanceof NotVerifiedError) {
         navigate("/ott");

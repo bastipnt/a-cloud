@@ -1,0 +1,41 @@
+{
+  "folders": [
+    { "path": "sites/server", "name": "server" },
+    { "path": "sites/web", "name": "web" },
+    { "path": "packages", "name": "packages" },
+    { "path": ".", "name": "root" },
+  ],
+  "settings": {
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "typescript.tsdk": "root/node_modules/typescript/lib",
+    "files.associations": {
+      "*.css": "tailwindcss",
+    },
+    "bun.test.filePattern": "**/*.test.ts",
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "bun: test (server)",
+        "type": "shell",
+        "command": "bun",
+        "args": ["test"],
+        "options": {
+          "cwd": "${workspaceFolder:server}",
+        },
+        "group": { "kind": "test", "isDefault": false },
+      },
+      {
+        "label": "bun: test (web)",
+        "type": "shell",
+        "command": "bun",
+        "args": ["test"],
+        "options": {
+          "cwd": "${workspaceFolder:web}",
+        },
+        "group": { "kind": "test", "isDefault": false },
+      },
+    ],
+  },
+}

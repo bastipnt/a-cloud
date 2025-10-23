@@ -1,5 +1,5 @@
 import { mergeUint8Arrays } from "@acloud/common";
-import { streamEncryptionChunkSize, type FileStream } from "@acloud/crypto";
+import { streamEncryptionChunkSize, type FileStream } from "../..";
 
 export const readFileToStream = async (file: File): Promise<FileStream> => {
   const N = streamEncryptionChunkSize;
@@ -67,5 +67,10 @@ export const fileStreamToFile = async (
 
 export const blobToUnit8Array = async (blob: Blob) => {
   const buffer = await new Response(blob).arrayBuffer();
+  return new Uint8Array(buffer);
+};
+
+export const fileToUnit8Array = async (file: File) => {
+  const buffer = await file.arrayBuffer();
   return new Uint8Array(buffer);
 };

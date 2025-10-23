@@ -1,6 +1,6 @@
 import { SignInError } from "@acloud/client";
 import { NotLoggedInError } from "@acloud/client/src/user";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import SignInForm, { SignInFormValues } from "../forms/SignInForm";
 import { useClient } from "../hooks/client";
@@ -52,7 +52,9 @@ const SignIn: React.FC = () => {
     navigate("/");
   };
 
-  const checkAlreadySignedIn = async () => {
+  const checkAlreadySignedIn = useCallback(async () => {
+    if (!getUser) return;
+
     try {
       const userId = await getUser();
       if (userId) navigate("/");
@@ -60,7 +62,7 @@ const SignIn: React.FC = () => {
       if (error instanceof NotLoggedInError) return;
       throw error;
     }
-  };
+  }, [getUser, navigate]);
 
   useEffect(() => {
     checkAlreadySignedIn();
@@ -69,7 +71,7 @@ const SignIn: React.FC = () => {
     if (!email) return;
 
     setExistingEmail(email);
-  });
+  }, [checkAlreadySignedIn, getEmail]);
 
   return (
     <>

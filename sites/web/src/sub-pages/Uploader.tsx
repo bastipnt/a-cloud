@@ -2,23 +2,18 @@ import { useContext } from "react";
 import { Link, useLocation } from "wouter";
 import Close from "../components/svg/Close";
 import FileUploadForm from "../forms/FileUploadForm";
-import { useClient } from "../hooks/client";
 import { useModalScroll } from "../hooks/modalScroll";
-import { FilesContext } from "../providers/FilesProvider";
+import { UploadsContext } from "../providers/UploadsProvider";
 
 const Uploader: React.FC = () => {
   useModalScroll();
-  const { uploadFiles } = useClient();
-  const { addFiles } = useContext(FilesContext);
   const [_, navigate] = useLocation();
+  const { enqueue } = useContext(UploadsContext);
 
   const handleSubmit = async ({ files }: { files: File[] }) => {
     if (!files || files.length === 0) return;
 
-    const uploadedFiles = await uploadFiles(files);
-    if (!uploadedFiles) return;
-
-    addFiles(uploadedFiles);
+    enqueue(files);
     navigate("/");
   };
 

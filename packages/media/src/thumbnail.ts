@@ -1,9 +1,12 @@
 import * as pdfjsLib from "pdfjs-dist";
-// @ts-expect-error
-import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+// import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import { extractAudioMetadata } from "./audioFile";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  "node_modules/pdfjs-dist/build/pdf.worker.mjs",
+  import.meta.url,
+).href;
 
 const MAX_THUMBNAIL_DIMENSION = 720;
 const MAX_THUMBNAIL_SIZE = 100 * 1024; // 100 KB
@@ -120,7 +123,6 @@ export const generatePDFThumbnail = async (pdfFile: File) => {
 
 export const generateAudioThumbnail = async (audioFile: File) => {
   const audioMetadata = await extractAudioMetadata(audioFile);
-  console.log(audioMetadata);
 
   const coverImages = audioMetadata.common.picture;
   if (!coverImages || coverImages.length === 0) return;

@@ -1,4 +1,5 @@
-import { Form, FormikProps, withFormik } from "formik";
+import { FormikProvider, useFormik } from "formik";
+import React from "react";
 import { InferType, object, string } from "yup";
 import Button from "../components/Button";
 import FormField from "../components/FormField";
@@ -15,46 +16,36 @@ interface FormProps {
   handleSubmit: (values: SignInFormValues) => Promise<void>;
 }
 
-const SignInInnerForm: React.FC<FormikProps<SignInFormValues>> = ({
-  touched,
-  errors,
-  isSubmitting,
-}) => {
+const SignInForm: React.FC<FormProps> = ({ existingEmail, handleSubmit }) => {
+  const formik = useFormik<SignInFormValues>({
+    initialValues: {
+      email: existingEmail || "",
+      password: "",
+    },
+    enableReinitialize: true, // keeps behavior from your HOC version
+    validationSchema: signInSchema,
+    onSubmit: async (values, formikHelpers) => {
+      try {
+        await handleSubmit(values);
+      } finally {
+        formikHelpers.setSubmitting(false);
+      }
+    },
+  });
+
   return (
-    <Form className="flex w-3xs flex-col gap-4 p-4">
-      <div className="flex flex-col">
-        <label htmlFor="email">Email</label>
-        <FormField id="email" type="email" name="email" placeholder="annie@mail.org" />
+    <FormikProvider value={formik}>
+      <form onSubmit={formik.handleSubmit} className="flex w-3xs flex-col gap-4 p-4" noValidate>
+        <FormField type="email" name="email" label="Email" placeholder="annie@mail.org" required />
 
-        {touched.email && errors.email && <div>{errors.email}</div>}
-      </div>
+        <FormField name="password" type="password" label="Password" required />
 
-      <div className="flex flex-col">
-        <label htmlFor="password">Password</label>
-        <FormField id="password" name="password" type="password" />
-        {touched.password && errors.password && <div>{errors.password}</div>}
-      </div>
-
-      <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
-        Submit
-      </Button>
-    </Form>
+        <Button type="submit" disabled={formik.isSubmitting} loading={formik.isSubmitting}>
+          Submit
+        </Button>
+      </form>
+    </FormikProvider>
   );
 };
-
-const SignInForm = withFormik<FormProps, SignInFormValues>({
-  mapPropsToValues: (props) => {
-    return {
-      email: props.existingEmail || "",
-      password: "",
-    };
-  },
-
-  enableReinitialize: true,
-
-  validationSchema: signInSchema,
-
-  handleSubmit: (values, { props: { handleSubmit } }) => handleSubmit(values),
-})(SignInInnerForm);
 
 export default SignInForm;

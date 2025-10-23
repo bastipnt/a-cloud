@@ -6,3 +6,5 @@ export {
   generateImageThumbnailCanvas,
   generatePDFThumbnail,
 } from "./src/thumbnail";
+
+export { type FileTypeResult } from "file-type";

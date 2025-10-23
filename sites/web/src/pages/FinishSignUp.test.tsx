@@ -1,5 +1,6 @@
 import { api } from "@acloud/client/api";
 import { config } from "@acloud/config";
+import { genSrpAttributes } from "@acloud/crypto";
 import {
   createNewTestUser,
   createSignedUpTestUser,
@@ -9,19 +10,74 @@ import {
 } from "@acloud/db";
 import { genJWT, testUsers } from "@acloud/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  Mock,
-  mock,
-} from "bun:test";
+import { ReactNode, useRef } from "react";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { useLocation } from "wouter";
 import FinishSignUp from "./FinishSignUp";
+
+// vi.mock("@acloud/client/src/worker-pools/crypto-worker-pool.ts", () => {
+//   class CryptoWorkerPool {
+//     genNewUserKeys = vi.fn();
+//     encryptFile = vi.fn();
+//     encryptObject = vi.fn();
+//     encryptBoxBase64 = vi.fn();
+//     encryptBlobToFile = vi.fn();
+
+//     init = vi.fn();
+//     terminateAll = vi.fn();
+//   }
+
+//   const createCryptoWorkerPool = vi.fn(() => new CryptoWorkerPool());
+
+//   return {
+//     createCryptoWorkerPool,
+//   };
+// });
+
+class MockCryptoWorkerPool {
+  genNewUserKeys = vi.fn();
+  encryptFile = vi.fn();
+  encryptObject = vi.fn();
+  encryptBoxBase64 = vi.fn();
+  encryptBlobToFile = vi.fn();
+
+  init = vi.fn();
+  terminateAll = vi.fn();
+}
+
+const cryptoWorkerPool = new MockCryptoWorkerPool();
+
+// const MockWorkerContext = createContext({});
+
+const { MockWorkerContext } = await vi.hoisted(async () => {
+  const { createContext } = await import("react");
+  return { MockWorkerContext: createContext({}) };
+});
+
+const MockWorkerProvider = ({ children }: { children: ReactNode }) => {
+  const cryptoWorkerPoolRef = useRef(cryptoWorkerPool);
+  return (
+    <MockWorkerContext.Provider value={{ cryptoWorkerPool: cryptoWorkerPoolRef }}>
+      {children}
+    </MockWorkerContext.Provider>
+  );
+};
+
+vi.mock("../providers/WorkerProvider", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("../providers/WorkerProvider")>();
+  return {
+    ...mod,
+    WorkerContext: MockWorkerContext,
+  };
+});
+
+const renderFinishSignUp = () => {
+  render(
+    <MockWorkerProvider>
+      <FinishSignUp />
+    </MockWorkerProvider>,
+  );
+};
 
 describe("FinishSignUp", () => {
   let emailField: HTMLInputElement;
@@ -37,28 +93,38 @@ describe("FinishSignUp", () => {
     await resetDB();
   });
 
-  const cryptoWorker = {
-    genNewUserKeys: mock((_password: string) => {
-      return renee.signUpParams.keyParams;
-    }),
-  };
+  // const genNewUserKeys = vi.fn(async (_password: string) => {
+  //   return renee.signUpParams.keyParams;
+  // });
 
-  const genSrpAttributes = mock((_password: string) => renee.signUpParams.srpParams);
+  // const genNewUserKeys = vi.fn();
 
   beforeAll(async () => {
-    // TODO: maybe only mock libsodium
-    mock.module("@acloud/crypto", () => {
+    // vi.mock("@acloud/client", async (importOriginal) => {
+    //   const mod = await importOriginal<typeof import("@acloud/client")>();
+
+    //   return {
+    //     ...mod,
+    //     createCryptoWorkerPool: vi.fn(async () => ({
+    //       genNewUserKeys: vi.fn(),
+    //     })),
+    //   };
+    // });
+
+    vi.mock("@acloud/crypto", async (importOriginal) => {
+      const mod = await importOriginal<typeof import("@acloud/crypto")>();
+
       return {
-        createCryptoWorker: () => ({
-          remote: new Promise((resolve) => resolve(cryptoWorker)),
-        }),
-        genSrpAttributes,
+        ...mod,
+        genSrpAttributes: vi.fn((_password: string) => renee.signUpParams.srpParams),
       };
     });
 
     await createVerifiedTestUser("renee");
     await createNewTestUser("ty");
     await createSignedUpTestUser("julia");
+
+    cryptoWorkerPool.genNewUserKeys.mockReturnValue(renee.signUpParams.keyParams);
   });
 
   afterEach(() => {
@@ -78,14 +144,14 @@ describe("FinishSignUp", () => {
       await cookieJar.setCookie(`tmpSignUpAuth=${tmpSignUpAuthJWT}`, config.endpoint.api);
       window.localStorage.setItem("email", renee.email);
 
-      render(<FinishSignUp />);
+      renderFinishSignUp();
       emailField = screen.getByLabelText<HTMLInputElement>("Email");
       passwordField = screen.getByLabelText<HTMLInputElement>("Password");
       passwordRepeatField = screen.getByLabelText<HTMLInputElement>("Repeat Password");
       submitButton = screen.getByRole<HTMLButtonElement>("button", { name: /submit/i });
 
-      cryptoWorker.genNewUserKeys.mockReturnValueOnce(renee.signUpParams.keyParams);
-      genSrpAttributes.mockReturnValueOnce(renee.signUpParams.srpParams);
+      cryptoWorkerPool.genNewUserKeys.mockReturnValueOnce(renee.signUpParams.keyParams);
+      (genSrpAttributes as Mock).mockReturnValueOnce(renee.signUpParams.srpParams);
     });
 
     it("finishes the sign up", async () => {
@@ -101,7 +167,7 @@ describe("FinishSignUp", () => {
       });
 
       await waitFor(() => {
-        expect(cryptoWorker.genNewUserKeys).toHaveBeenCalledWith(renee.password);
+        expect(cryptoWorkerPool.genNewUserKeys).toHaveBeenCalledWith(renee.password);
         expect(genSrpAttributes).toHaveBeenCalledWith(renee.password);
       });
 
@@ -130,7 +196,7 @@ describe("FinishSignUp", () => {
     beforeEach(async () => {
       window.localStorage.setItem("email", renee.email);
 
-      render(<FinishSignUp />);
+      renderFinishSignUp();
       emailField = screen.getByLabelText<HTMLInputElement>("Email");
       passwordField = screen.getByLabelText<HTMLInputElement>("Password");
       passwordRepeatField = screen.getByLabelText<HTMLInputElement>("Repeat Password");
@@ -162,14 +228,14 @@ describe("FinishSignUp", () => {
       await cookieJar.setCookie(`tmpSignUpAuth=${tmpSignUpAuthJWT}`, config.endpoint.api);
       window.localStorage.setItem("email", ty.email);
 
-      render(<FinishSignUp />);
+      renderFinishSignUp();
       emailField = screen.getByLabelText<HTMLInputElement>("Email");
       passwordField = screen.getByLabelText<HTMLInputElement>("Password");
       passwordRepeatField = screen.getByLabelText<HTMLInputElement>("Repeat Password");
       submitButton = screen.getByRole<HTMLButtonElement>("button", { name: /submit/i });
 
-      cryptoWorker.genNewUserKeys.mockReturnValueOnce(ty.signUpParams.keyParams);
-      genSrpAttributes.mockReturnValueOnce(ty.signUpParams.srpParams);
+      cryptoWorkerPool.genNewUserKeys.mockReturnValueOnce(ty.signUpParams.keyParams);
+      (genSrpAttributes as Mock).mockReturnValueOnce(ty.signUpParams.srpParams);
     });
 
     it("redirects to /verify-ott", async () => {
@@ -181,7 +247,7 @@ describe("FinishSignUp", () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(cryptoWorker.genNewUserKeys).toHaveBeenCalledWith(ty.password);
+        expect(cryptoWorkerPool.genNewUserKeys).toHaveBeenCalledWith(ty.password);
         expect(genSrpAttributes).toHaveBeenCalledWith(ty.password);
       });
 
@@ -204,14 +270,14 @@ describe("FinishSignUp", () => {
       await cookieJar.setCookie(`tmpSignUpAuth=${tmpSignUpAuthJWT}`, config.endpoint.api);
       window.localStorage.setItem("email", julia.email);
 
-      render(<FinishSignUp />);
+      renderFinishSignUp();
       emailField = screen.getByLabelText<HTMLInputElement>("Email");
       passwordField = screen.getByLabelText<HTMLInputElement>("Password");
       passwordRepeatField = screen.getByLabelText<HTMLInputElement>("Repeat Password");
       submitButton = screen.getByRole<HTMLButtonElement>("button", { name: /submit/i });
 
-      cryptoWorker.genNewUserKeys.mockReturnValueOnce(julia.signUpParams.keyParams);
-      genSrpAttributes.mockReturnValueOnce(julia.signUpParams.srpParams);
+      cryptoWorkerPool.genNewUserKeys.mockReturnValueOnce(julia.signUpParams.keyParams);
+      (genSrpAttributes as Mock).mockReturnValueOnce(julia.signUpParams.srpParams);
     });
 
     it("redirects to /sign-in", async () => {
@@ -223,7 +289,7 @@ describe("FinishSignUp", () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(cryptoWorker.genNewUserKeys).toHaveBeenCalledWith(julia.password);
+        expect(cryptoWorkerPool.genNewUserKeys).toHaveBeenCalledWith(julia.password);
         expect(genSrpAttributes).toHaveBeenCalledWith(julia.password);
       });
 

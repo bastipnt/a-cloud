@@ -1,8 +1,8 @@
 import { mergeUint8Arrays } from "@acloud/common";
-import { streamEncryptionChunkSize } from "@acloud/crypto";
 import sodium from "libsodium-wrappers-sumo";
 import { fromBase64, toBase64 } from "./util/conversion-helper";
 import { unit8ArrayToFile } from "./util/file-helper";
+import { streamEncryptionChunkSize } from "..";
 
 class FileDecryptionError extends Error {
   override name: string = "FileDecryptionError";

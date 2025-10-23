@@ -1,4 +1,0 @@
-telemetry = false
-
-[test]
-preload = ["./happydom.ts", "./setup-tests.ts", "../../packages/client/api-mock.ts"]

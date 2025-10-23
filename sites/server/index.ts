@@ -20,4 +20,4 @@ console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.por
 
 export type App = typeof app;
 
-export { type KeyParams } from "./src/userAuth";
+export { type KeyParams } from "./src/auth/model";

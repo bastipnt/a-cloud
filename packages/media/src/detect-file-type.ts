@@ -49,8 +49,8 @@ const getExtensionFromName = (filename: string) => {
   return parts.length > 1 ? (parts.pop()?.toLowerCase() ?? "") : "";
 };
 
-const detectMimeByExt = (file: File): FileTypeResult => {
-  const ext = getExtensionFromName(file.name);
+const detectMimeByExt = (fileName: string): FileTypeResult => {
+  const ext = getExtensionFromName(fileName);
   const mime = getMimeFromExt(ext);
 
   return { mime, ext };
@@ -59,5 +59,5 @@ const detectMimeByExt = (file: File): FileTypeResult => {
 export const detectFileType = async (file: File): Promise<FileTypeResult> => {
   const fileType = await fileTypeFromBlob(file);
   if (fileType !== undefined && fileType.ext !== "xml") return fileType;
-  return detectMimeByExt(file);
+  return detectMimeByExt(file.name);
 };

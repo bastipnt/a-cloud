@@ -13,11 +13,16 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: path.resolve(__dirname, "../../node_modules/material-icon-theme/icons/*.svg"),
+          src: path.resolve(__dirname, "./node_modules/material-icon-theme/icons/*.svg"),
           dest: "material-icons",
         },
       ],
     }),
     react(),
   ],
+  build: {
+    rollupOptions: {
+      external: ["react", "react-dom", "formik"],
+    },
+  },
 });

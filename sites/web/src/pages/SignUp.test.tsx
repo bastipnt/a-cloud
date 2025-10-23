@@ -3,7 +3,7 @@ import { config } from "@acloud/config";
 import { createSignedUpTestUser, findOttByUserId, findUserByEmail, resetDB } from "@acloud/db";
 import { testUsers } from "@acloud/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { useLocation } from "wouter";
 import SignUp from "./SignUp";
 

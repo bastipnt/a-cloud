@@ -1,4 +1,6 @@
 telemetry = false
 
 [test]
-root = "sites"
+testSkipPatterns = [
+  "sites/web"
+]

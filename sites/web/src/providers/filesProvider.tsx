@@ -1,4 +1,4 @@
-import { FileData } from "@acloud/media";
+import type { FileData } from "@acloud/media";
 import { createContext, ReactNode, useCallback, useState } from "react";
 import { arrayUniqueByKey } from "../utils/arrayUtils";
 

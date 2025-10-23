@@ -1,10 +1,11 @@
 import { genOTT } from "@acloud/crypto";
-import { db, ottsTable } from "@acloud/db";
 import { testUsers } from "@acloud/testing";
 import { eq } from "drizzle-orm";
 import { keysTable } from "./schema/keys";
 import { srpsTable } from "./schema/srps";
 import { usersTable } from "./schema/users";
+import { db } from "./db";
+import { ottsTable } from "./schema/otts";
 
 const assureTestEnv = () => {
   if (process.env.NODE_ENV !== "test") throw new Error("Not a test environment");

@@ -1,8 +1,8 @@
-import { decryptUnit8Array, encryptBlobToFile, genFileKeyBase64 } from "@acloud/crypto";
 import { describe, expect, it } from "bun:test";
 import { encryptUnit8ArrayBase64 } from "./encrypt";
 import { fromBase64 } from "./util/conversion-helper";
 import { blobToUnit8Array } from "./util/file-helper";
+import { decryptUnit8Array, encryptBlobToFile, genFileKeyBase64 } from "..";
 
 describe("encryption decryption flow", () => {
   it("encrypts a Unit8Array and then decrypts it again", async () => {

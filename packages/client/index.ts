@@ -16,4 +16,8 @@ export {
 } from "./src/user";
 
 export { FilesLoadingError, getFile, getFiles, softDeleteFile } from "./src/file";
-export { uploadFiles } from "./src/upload";
+export { uploadFile } from "./src/upload";
+export {
+  createCryptoWorkerPool,
+  type CryptoWorkerPool,
+} from "./src/worker-pools/crypto-worker-pool";

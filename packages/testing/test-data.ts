@@ -8,7 +8,7 @@ import {
   genSrpClientEphemeral,
   getHashBase64,
 } from "@acloud/crypto";
-import { srpServer } from "@acloud/server/src/srpServer";
+import { srpService } from "@acloud/server/src/srpService";
 import { genJWT } from "./util";
 
 export const genUserId = () => {
@@ -38,7 +38,7 @@ export const genSignUpParams = async (password: string) => {
 };
 
 export const genSprServerEphemeral = async (srpVerifier: string) => {
-  return await srpServer.generateEphemeral(srpVerifier);
+  return await srpService.generateEphemeral(srpVerifier);
 };
 
 export const genSrpServerSession = async (
@@ -48,7 +48,7 @@ export const genSrpServerSession = async (
   srpVerifier: string,
   srpClientSessionProof: string,
 ) => {
-  return await srpServer.deriveSession(
+  return await srpService.deriveSession(
     srpServerEphemeralSecret,
     srpClientEphemeralPublic,
     srpSalt,

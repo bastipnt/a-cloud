@@ -1,7 +1,8 @@
 import {
   getFile as _getFile,
   getFiles as _getFiles,
-  uploadFiles as _uploadFiles,
+  uploadFile as _uploadFile,
+  CryptoWorkerPool,
   finishSignUp,
   getUser,
   loadFileToUnit8Array,
@@ -15,24 +16,26 @@ import {
   verifyOTT,
 } from "@acloud/client";
 import { FileData } from "@acloud/media";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { KeysContext } from "../providers/KeysProvider";
 import { useStorage } from "./storage";
 
 export const useClient = () => {
   const { keyEncryptionKey } = useContext(KeysContext);
   const { getMainKeyBase64 } = useStorage();
-  const [mainKey, setMainKey] = useState<Base64URLString>();
+  const mainKeyRef = useRef<Base64URLString | null>(null);
+  const [mainKey, setMainKey] = useState<Base64URLString | null>(null);
 
   const setMainKeyAsync = useCallback(async () => {
     if (!keyEncryptionKey) return;
     const newMainKey = await getMainKeyBase64(keyEncryptionKey);
     setMainKey(newMainKey);
-  }, [keyEncryptionKey]);
+    mainKeyRef.current = newMainKey;
+  }, [keyEncryptionKey, getMainKeyBase64]);
 
   useEffect(() => {
     setMainKeyAsync();
-  }, [keyEncryptionKey]);
+  }, [setMainKeyAsync]);
 
   const getFiles = useCallback(async (): Promise<FileData[]> => {
     if (!mainKey) return [];
@@ -47,16 +50,16 @@ export const useClient = () => {
     [mainKey],
   );
 
-  const uploadFiles = useCallback(
-    async (files: File[]): Promise<FileData[] | null> => {
-      if (!mainKey) return null;
-      return await _uploadFiles(files, mainKey);
+  const uploadFile = useCallback(
+    async (file: File, cryptoWorkerPool: CryptoWorkerPool) => {
+      if (!mainKey || !cryptoWorkerPool) return null;
+      return _uploadFile(file, mainKey, cryptoWorkerPool);
     },
     [mainKey],
   );
 
   return {
-    uploadFiles,
+    uploadFile,
     signIn,
     proofSignIn,
     signUp,

@@ -15,19 +15,16 @@
     "@acloud/config": "workspace:*",
     "@acloud/crypto": "workspace:*",
     "@acloud/db": "workspace:*",
-    "@elysiajs/cors": "^1.2.0",
-    "@elysiajs/jwt": "^1.2.0",
+    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/jwt": "^1.4.0",
     "@swan-io/srp": "^0.2.6",
-    "elysia": "latest"
+    "elysia": "catalog:elysia"
   },
   "devDependencies": {
     "@acloud/testing": "workspace:*",
-    "@elysiajs/eden": "^1.2.0",
+    "@elysiajs/eden": "catalog:elysia",
     "@types/bun": "^1.2.8",
     "bun-types": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
   },
   "module": "index.js"
 }
