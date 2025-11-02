@@ -12,7 +12,7 @@
     "@acloud/crypto": "workspace:*"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "catalog:",
     "@types/js-yaml": "^4.0.9"
   }
 }

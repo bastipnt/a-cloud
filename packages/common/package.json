@@ -4,7 +4,7 @@
   "module": "index.ts",
   "main": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "catalog:"
   },
   "type": "module",
   "dependencies": {

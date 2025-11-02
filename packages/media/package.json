@@ -5,7 +5,7 @@
   "main": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "catalog:"
   },
   "dependencies": {
     "@acloud/common": "workspace:*",

@@ -23,8 +23,8 @@
   "devDependencies": {
     "@acloud/testing": "workspace:*",
     "@elysiajs/eden": "catalog:elysia",
-    "@types/bun": "^1.2.8",
-    "bun-types": "latest"
+    "@types/bun": "catalog:",
+    "bun-types": "catalog:"
   },
   "module": "index.js"
 }

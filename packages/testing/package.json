@@ -11,7 +11,7 @@
     "@acloud/crypto": "workspace:*",
     "@acloud/server": "workspace:*",
     "@elysiajs/jwt": "^1.4.0",
-    "@types/bun": "latest",
+    "@types/bun": "catalog:",
     "tough-cookie": "^6.0.0"
   }
 }
